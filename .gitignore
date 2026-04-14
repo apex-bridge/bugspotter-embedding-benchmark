@@ -1,0 +1,28 @@
+# Python
+venv*/
+__pycache__/
+*.pyc
+*.egg-info/
+
+# Generated data (regenerate with data/ scripts)
+data/*.json
+data/*.csv
+
+# Results (regenerate with benchmark/ scripts)
+results/
+results-*/
+
+# Vector store data
+.chroma/
+.chroma_bench/
+*.db
+
+# Docker volumes
+ollama_data/
+pg_data/
+qdrant_data/
+
+# System files
+.DS_Store
+.env
+.setup
