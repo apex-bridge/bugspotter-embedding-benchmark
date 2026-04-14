@@ -4,9 +4,9 @@ __pycache__/
 *.pyc
 *.egg-info/
 
-# Generated data (regenerate with data/ scripts)
-data/*.json
-data/*.csv
+# Scraped data (regenerate with data/scrape_*.py)
+data/github_issues.json
+data/bugzilla_bugs.json
 
 # Results (regenerate with benchmark/ scripts)
 results/
