@@ -48,7 +48,7 @@ def main():
     # Yes -> pgvector
     draw_line(ax, 3.5, 6.05, 2, 5.3, "Yes")
     draw_box(ax, 2, 4.8, "pgvector", STORE_COLORS["pgvector"], width=2.5, height=0.7, fontsize=11)
-    ax.text(2, 4.1, "Zero additional infra\nSQL + vectors in one DB\n0.9ms queries", ha="center",
+    ax.text(2, 4.1, "Zero additional infra\nSQL + vectors in one DB\n10.8ms @100K records", ha="center",
             fontsize=9, color=MOCHA["subtext0"], style="italic")
 
     # No -> next question
@@ -58,7 +58,7 @@ def main():
     # Yes -> sqlite-vec
     draw_line(ax, 6.5, 4.35, 5.5, 3.3, "Yes")
     draw_box(ax, 5.5, 2.8, "sqlite-vec", STORE_COLORS["sqlite-vec"], width=2.5, height=0.7, fontsize=11)
-    ax.text(5.5, 2.1, "One .db file, 0.5MB RAM\nPerfect for solo dev\n1.05ms queries", ha="center",
+    ax.text(5.5, 2.1, "One .db file\nPerfect for solo dev\n<5K records only", ha="center",
             fontsize=9, color=MOCHA["subtext0"], style="italic")
 
     # No -> next question

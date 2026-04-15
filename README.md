@@ -4,6 +4,8 @@ I benchmarked 6 self-hosted embedding models for duplicate bug report detection.
 
 **Full write-up:** [I Benchmarked 6 Embedding Models for Bug Report Deduplication. Here's What Actually Works.](https://dev.to/bugspotter/embedding-models-bug-dedup)
 
+![F1 vs Latency](results-v2/figures/fig_01_hero_scatter.png)
+
 ## Key Findings
 
 - **Qwen3 (7.6B) wins — but barely.** F1=0.990 vs mxbai-embed-large (335M) at F1=0.987. The 0.3% gap is real but narrow.
@@ -132,6 +134,20 @@ This installs everything, pulls models, generates the dataset, and runs the full
 - **D2** — Semantic duplicates / paraphrases (main test)
 - **D3** — Hard negatives: different bugs, same component (critical category)
 - **D4** — Easy negatives: completely different bugs
+
+## Embedding Input Example
+
+Each bug report is converted to a single text string for embedding:
+
+```
+Checkout button unresponsive after coupon applied | After applying coupon
+code SAVE20, the Place Order button stops responding to clicks. No console
+errors. Works fine without coupon. | [warn] React: Cannot update during an
+existing state transition | POST /api/orders returned 500 (took 340ms)
+| Browser: Chrome 124 | OS: Windows 10 | Page: /checkout
+```
+
+Fields joined with `|`: title, description, console errors (up to 5), failed network requests (up to 3), browser, OS, page path.
 
 ## Hardware
 

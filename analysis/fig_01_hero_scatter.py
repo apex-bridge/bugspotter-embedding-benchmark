@@ -14,13 +14,23 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 MODEL_PARAMS = {
-    "qwen3_embedding": 0.6,
+    "qwen3_embedding": 7.6,
     "qwen3_embedding_4b": 4.0,
     "nomic_embed_text": 0.137,
     "mxbai_embed_large": 0.335,
     "bge_m3": 0.568,
     "all_minilm": 0.022,
-    "snowflake_arctic_embed": 0.110,
+    "snowflake_arctic_embed": 0.334,
+}
+
+# Manual label offsets to avoid overlap (dx, dy in points)
+LABEL_OFFSETS = {
+    "all_minilm": (-60, -25),
+    "snowflake_arctic_embed": (14, -20),
+    "nomic_embed_text": (14, 10),
+    "mxbai_embed_large": (14, 10),
+    "bge_m3": (14, 10),
+    "qwen3_embedding": (-80, -18),
 }
 
 
@@ -50,6 +60,17 @@ def main():
 
     fig, ax = plt.subplots(figsize=(12, 8))
 
+    # Fixed label positions (in data coords) to avoid all overlaps
+    # Format: model_key -> (label_x, label_y)
+    LABEL_POSITIONS = {
+        "all-minilm": (45, 0.9765),
+        "snowflake-arctic-embed": (350, 0.9770),
+        "nomic-embed-text": (140, 0.9825),
+        "mxbai-embed-large": (350, 0.9880),
+        "bge-m3": (400, 0.9900),
+        "qwen3-embedding": (2200, 0.9920),
+    }
+
     for row in rows:
         model = row["model"]
         f1 = float(row["best_f1"])
@@ -61,14 +82,26 @@ def main():
 
         ax.scatter(latency, f1, s=size, c=color, alpha=0.85, edgecolors="white",
                    linewidths=2, zorder=5)
-        ax.annotate(model_display_name(model), (latency, f1),
-                    textcoords="offset points", xytext=(14, 10),
-                    fontsize=11, fontweight="bold", color=color)
+
+        # Use fixed label position with arrow pointing to dot
+        from plot_config import normalize_model_name
+        model_key = normalize_model_name(model)
+        lpos = LABEL_POSITIONS.get(model_key)
+        if lpos:
+            ax.annotate(model_display_name(model), (latency, f1),
+                        xytext=lpos,
+                        fontsize=11, fontweight="bold", color=color,
+                        arrowprops=dict(arrowstyle="-", color=color, alpha=0.4, lw=1),
+                        zorder=6)
+        else:
+            ax.annotate(model_display_name(model), (latency, f1),
+                        textcoords="offset points", xytext=(14, 10),
+                        fontsize=11, fontweight="bold", color=color)
 
     # Zoom Y-axis to show differences clearly
     f1_values = [float(r["best_f1"]) for r in rows]
-    y_min = min(f1_values) - 0.002
-    y_max = max(f1_values) + 0.002
+    y_min = min(f1_values) - 0.004
+    y_max = max(f1_values) + 0.003
     ax.set_ylim(y_min, y_max)
 
     ax.set_xlabel("Median Latency per Embedding (ms)", fontsize=13, fontweight="bold")
