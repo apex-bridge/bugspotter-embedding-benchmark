@@ -1,28 +1,27 @@
 # Embedding Models for Bug Report Deduplication
 
-We benchmarked 6 self-hosted embedding models for duplicate bug report detection. All models run locally via [Ollama](https://ollama.com/) on a single CPU server (€25/mo). No data leaves your network.
+I benchmarked 6 self-hosted embedding models for duplicate bug report detection. 650 bug reports (including 250 real SDK captures via Playwright), 4,475 labeled pairs. All models run locally via [Ollama](https://ollama.com/) on a single CPU server (€25/mo). No data leaves your network.
 
 **Full write-up:** [I Benchmarked 6 Embedding Models for Bug Report Deduplication. Here's What Actually Works.](https://dev.to/bugspotter/embedding-models-bug-dedup)
 
 ## Key Findings
 
-- **A 335M model matched a 7.6B model.** mxbai-embed-large (F1=0.996) vs Qwen3 (F1=0.995) — 22x smaller, 10x faster.
-- **Threshold 0.9 is a trap.** At cosine ≥ 0.9, recall drops to 8–42%. Optimal thresholds range from 0.55 to 0.75, different for every model.
-- **Machine-captured metadata > human descriptions.** Console errors, network logs, and stack traces improved F1 from 0.86 to 0.995.
-- **You probably don't need a dedicated vector DB.** pgvector was faster than Qdrant at bug-tracker scale (0.9ms vs 4.5ms).
+- **Qwen3 (7.6B) wins — but barely.** F1=0.990 vs mxbai-embed-large (335M) at F1=0.987. The 0.3% gap is real but narrow.
+- **Threshold 0.9 is a trap.** At cosine ≥ 0.9, recall drops to 22–58%. Optimal thresholds range from 0.65 to 0.74, different for every model.
+- **Machine-captured metadata > human descriptions.** Console errors, network logs, and stack traces improved F1 from 0.951 to 0.990.
 
 ## Models Tested
 
 | Model | Params | Dims | F1 | Latency |
 |-------|--------|------|----|---------|
-| mxbai-embed-large | 335M | 1024 | 0.996 | 186ms |
-| bge-m3 | 568M | 1024 | 0.995 | 221ms |
-| qwen3-embedding | 7.6B | 4096 | 0.995 | 1,932ms |
-| all-minilm | 22M | 384 | 0.992 | 13ms |
-| snowflake-arctic-embed | 334M | 768 | 0.982 | 188ms |
-| nomic-embed-text | 137M | 768 | 0.979 | 69ms |
+| qwen3-embedding | 7.6B | 4096 | 0.990 | 2,662ms |
+| bge-m3 | 568M | 1024 | 0.989 | 268ms |
+| mxbai-embed-large | 335M | 1024 | 0.987 | 224ms |
+| nomic-embed-text | 137M | 768 | 0.981 | 82ms |
+| snowflake-arctic-embed | 334M | 768 | 0.979 | 220ms |
+| all-minilm | 22M | 384 | 0.979 | 28ms |
 
-Vector stores: pgvector, Qdrant, ChromaDB, sqlite-vec — all compared at 240 and up to 100K records.
+Vector stores: Qdrant, ChromaDB, sqlite-vec tested at 550 records; pgvector included in scale tests up to 100K.
 
 ## Quick Start
 
@@ -50,7 +49,7 @@ pip install -r requirements.txt
 Or run steps individually:
 
 ```bash
-# 1. Generate dataset (540 bug reports, ~2900 labeled pairs)
+# 1. Generate dataset (650 bug reports, ~4475 labeled pairs)
 python data/generate_synthetic.py
 python data/generate_pairs.py
 
@@ -123,12 +122,12 @@ This installs everything, pulls models, generates the dataset, and runs the full
 
 ## Dataset
 
-540 bug reports from 3 sources:
-- **300** real GitHub Issues (React, Next.js, VS Code, Angular, Vue, Svelte, Tailwind CSS)
-- **200** synthetic (20 bug archetypes × 10 paraphrases each)
-- **40** BugSpotter SDK captures (structured: console errors, network logs, stack traces)
+650 bug reports from 3 sources:
+- **100** real GitHub Issues (React, Next.js, VS Code, Angular, Vue, Svelte, Tailwind CSS)
+- **300** synthetic (30 bug archetypes × 10 paraphrases each)
+- **250** real SDK captures (25 bugs × 10 variations, collected via Playwright from the BugSpotter demo app)
 
-~2,900 labeled pairs across 4 difficulty levels:
+~4,475 labeled pairs across 4 difficulty levels:
 - **D1** — Exact duplicates (sanity check)
 - **D2** — Semantic duplicates / paraphrases (main test)
 - **D3** — Hard negatives: different bugs, same component (critical category)
