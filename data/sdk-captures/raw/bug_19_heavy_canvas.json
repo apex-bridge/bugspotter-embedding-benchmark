@@ -1,0 +1,50 @@
+{
+  "bug_id": 19,
+  "bug_slug": "heavy_canvas",
+  "component": "upload",
+  "error_type": "performance",
+  "original_title": "Memory-heavy canvas: 8000x8000 image processing",
+  "original_description": "The image upload handler creates an oversized canvas (8000x8000 = 256MB raw pixel data) without checking dimensions first. This can crash tabs on low-memory devices.",
+  "report": {
+    "console": [
+      {
+        "level": "log",
+        "message": "[BuggyApp] BugSpotter SDK initialized",
+        "timestamp": 1776195342020
+      },
+      {
+        "level": "log",
+        "message": "[Upload] Processing uploaded image...",
+        "timestamp": 1776195344112
+      },
+      {
+        "level": "warn",
+        "message": "[Upload] Creating 8000x8000 canvas (244MB)",
+        "timestamp": 1776195344114
+      },
+      {
+        "level": "log",
+        "message": "[Upload] Canvas rendered, extracting data...",
+        "timestamp": 1776195344406
+      },
+      {
+        "level": "warn",
+        "message": "[Upload] ImageData allocated: 244MB",
+        "timestamp": 1776195345342
+      }
+    ],
+    "network": [],
+    "metadata": {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/[REDACTED-IP] Safari/537.36",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "browser": "Chrome",
+      "os": "Windows",
+      "url": "https://demo.kz.bugspotter.io/buggy-app.html",
+      "timestamp": 1776195345345
+    }
+  },
+  "captured_at": "2026-04-14T19:35:53.071Z"
+}

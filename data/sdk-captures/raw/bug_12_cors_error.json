@@ -1,0 +1,50 @@
+{
+  "bug_id": 12,
+  "bug_slug": "cors_error",
+  "component": "api",
+  "error_type": "network_error",
+  "original_title": "CORS error: cross-origin request blocked",
+  "original_description": "Fetch to external API blocked by browser CORS policy. The server responded but did not include Access-Control-Allow-Origin headers, so the browser rejected the response.",
+  "report": {
+    "console": [
+      {
+        "level": "log",
+        "message": "[BuggyApp] BugSpotter SDK initialized",
+        "timestamp": 1776195221071
+      },
+      {
+        "level": "log",
+        "message": "[API] Fetching external resource...",
+        "timestamp": 1776195222598
+      },
+      {
+        "level": "error",
+        "message": "[API] CORS error: Failed to fetch",
+        "timestamp": 1776195222942,
+        "stack": "    at console.<computed> [as error] (https://cdn.bugspotter.io/sdk/bugspotter-latest.min.js:2:108213)\n    at triggerCorsError (https://demo.kz.bugspotter.io/buggy-app.html:1330:19)\n    at async <anonymous>:328:30"
+      }
+    ],
+    "network": [
+      {
+        "url": "https://google.com",
+        "method": "GET",
+        "status": 0,
+        "duration": 343,
+        "timestamp": 1776195222599,
+        "error": "Failed to fetch"
+      }
+    ],
+    "metadata": {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/[REDACTED-IP] Safari/537.36",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "browser": "Chrome",
+      "os": "Windows",
+      "url": "https://demo.kz.bugspotter.io/buggy-app.html",
+      "timestamp": 1776195222945
+    }
+  },
+  "captured_at": "2026-04-14T19:33:54.219Z"
+}

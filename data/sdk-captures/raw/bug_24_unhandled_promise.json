@@ -1,0 +1,46 @@
+{
+  "bug_id": 24,
+  "bug_slug": "unhandled_promise",
+  "component": "profile",
+  "error_type": "js_error",
+  "original_title": "Unhandled promise rejection: Background sync failed: connection reset",
+  "original_description": "A background synchronization promise rejected without a catch handler. The error is silently swallowed unless the global unhandledrejection event is monitored. Data may be lost or stale.",
+  "report": {
+    "console": [
+      {
+        "level": "log",
+        "message": "[BuggyApp] BugSpotter SDK initialized",
+        "timestamp": 1776194968122
+      },
+      {
+        "level": "log",
+        "message": "[Async] Starting background sync...",
+        "timestamp": 1776194969663
+      },
+      {
+        "level": "warn",
+        "message": "[Async] About to trigger unhandled promise rejection",
+        "timestamp": 1776194969663
+      },
+      {
+        "level": "error",
+        "message": "[Async] Unhandled promise rejection: Background sync failed: connection reset",
+        "timestamp": 1776194969665,
+        "stack": "    at console.<computed> [as error] (https://cdn.bugspotter.io/sdk/bugspotter-latest.min.js:2:108213)\n    at handler (https://demo.kz.bugspotter.io/buggy-app.html:1721:19)"
+      }
+    ],
+    "network": [],
+    "metadata": {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/[REDACTED-IP] Safari/537.36",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "browser": "Chrome",
+      "os": "Windows",
+      "url": "https://demo.kz.bugspotter.io/buggy-app.html",
+      "timestamp": 1776194969668
+    }
+  },
+  "captured_at": "2026-04-14T19:29:32.702Z"
+}

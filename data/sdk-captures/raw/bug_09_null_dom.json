@@ -1,0 +1,46 @@
+{
+  "bug_id": 9,
+  "bug_slug": "null_dom",
+  "component": "profile",
+  "error_type": "js_error",
+  "original_title": "Null DOM reference: Cannot set properties of null (setting 'textContent')",
+  "original_description": "The profile page tries to update #user-avatar-container which does not exist in the DOM. The element is conditionally rendered and missing when the user has no avatar set.",
+  "report": {
+    "console": [
+      {
+        "level": "log",
+        "message": "[BuggyApp] BugSpotter SDK initialized",
+        "timestamp": 1776195200243
+      },
+      {
+        "level": "log",
+        "message": "[Profile] Loading user profile section...",
+        "timestamp": 1776195202022
+      },
+      {
+        "level": "log",
+        "message": "[Profile] Setting avatar for user...",
+        "timestamp": 1776195202023
+      },
+      {
+        "level": "error",
+        "message": "[Profile] DOM reference error: Cannot set properties of null (setting 'textContent')",
+        "timestamp": 1776195202023,
+        "stack": "    at console.<computed> [as error] (https://cdn.bugspotter.io/sdk/bugspotter-latest.min.js:2:108213)\n    at triggerNullDom (https://demo.kz.bugspotter.io/buggy-app.html:1257:19)\n    at eval (eval at evaluate (:302:30), <anonymous>:1:1)\n    at eval (<anonymous>)\n    at UtilityScript.evaluate (<anonymous>:302:30)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+      }
+    ],
+    "network": [],
+    "metadata": {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/[REDACTED-IP] Safari/537.36",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "browser": "Chrome",
+      "os": "Windows",
+      "url": "https://demo.kz.bugspotter.io/buggy-app.html",
+      "timestamp": 1776195202026
+    }
+  },
+  "captured_at": "2026-04-14T19:33:27.128Z"
+}

@@ -22,8 +22,8 @@ REPOS = [
     "vercel/next.js"
 ]
 LABELS = "bug"
-MAX_PER_REPO = 100
-GLOBAL_TARGET = 300 # Total reports we need across all repos
+MAX_PER_REPO = 50
+GLOBAL_TARGET = 100 # Total reports we need across all repos
 
 def extract_console_logs(body):
     """Simple heuristic to extract logs/stack traces from the issue description."""

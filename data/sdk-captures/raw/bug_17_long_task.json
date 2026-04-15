@@ -1,0 +1,51 @@
+{
+  "bug_id": 17,
+  "bug_slug": "long_task",
+  "component": "feed",
+  "error_type": "performance",
+  "original_title": "Main thread blocked for 3.0s",
+  "original_description": "A synchronous computation blocked the main thread for 3001ms. The UI was completely frozen during this time. Users cannot interact with the page, scroll, or click anything.",
+  "report": {
+    "console": [
+      {
+        "level": "log",
+        "message": "[BuggyApp] BugSpotter SDK initialized",
+        "timestamp": 1776195280473
+      },
+      {
+        "level": "log",
+        "message": "[Compute] Starting heavy computation...",
+        "timestamp": 1776195282566
+      },
+      {
+        "level": "warn",
+        "message": "[Performance] Main thread will be blocked",
+        "timestamp": 1776195282567
+      },
+      {
+        "level": "error",
+        "message": "[Performance] Main thread blocked for 3001ms",
+        "timestamp": 1776195285679,
+        "stack": "    at console.<computed> [as error] (https://cdn.bugspotter.io/sdk/bugspotter-latest.min.js:2:108213)\n    at triggerLongTask (https://demo.kz.bugspotter.io/buggy-app.html:1506:17)\n    at async <anonymous>:328:30"
+      },
+      {
+        "level": "warn",
+        "message": "[Performance] Long task detected: 3001ms (threshold: 50ms)",
+        "timestamp": 1776195285681
+      }
+    ],
+    "network": [],
+    "metadata": {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/[REDACTED-IP] Safari/537.36",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "browser": "Chrome",
+      "os": "Windows",
+      "url": "https://demo.kz.bugspotter.io/buggy-app.html",
+      "timestamp": 1776195285686
+    }
+  },
+  "captured_at": "2026-04-14T19:34:53.630Z"
+}

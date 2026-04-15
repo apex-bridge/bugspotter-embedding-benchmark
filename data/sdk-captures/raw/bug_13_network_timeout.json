@@ -1,0 +1,50 @@
+{
+  "bug_id": 13,
+  "bug_slug": "network_timeout",
+  "component": "api",
+  "error_type": "network_error",
+  "original_title": "Network request failed: AbortError",
+  "original_description": "The API call to a remote endpoint failed. On most networks this is an AbortController timeout after 2 seconds; on some it may fail immediately with a network error. Either way the user action is blocked.",
+  "report": {
+    "console": [
+      {
+        "level": "log",
+        "message": "[BuggyApp] BugSpotter SDK initialized",
+        "timestamp": 1776195234455
+      },
+      {
+        "level": "log",
+        "message": "[API] Fetching with 2s timeout...",
+        "timestamp": 1776195236002
+      },
+      {
+        "level": "error",
+        "message": "[API] Request failed: AbortError: signal is aborted without reason",
+        "timestamp": 1776195238016,
+        "stack": "    at console.<computed> [as error] (https://cdn.bugspotter.io/sdk/bugspotter-latest.min.js:2:108213)\n    at triggerNetworkTimeout (https://demo.kz.bugspotter.io/buggy-app.html:1359:19)\n    at async <anonymous>:328:30"
+      }
+    ],
+    "network": [
+      {
+        "url": "https://[REDACTED-IP]/api/slow-endpoint",
+        "method": "GET",
+        "status": 0,
+        "duration": 2012,
+        "timestamp": 1776195236003,
+        "error": "signal is aborted without reason"
+      }
+    ],
+    "metadata": {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/[REDACTED-IP] Safari/537.36",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "browser": "Chrome",
+      "os": "Windows",
+      "url": "https://demo.kz.bugspotter.io/buggy-app.html",
+      "timestamp": 1776195238021
+    }
+  },
+  "captured_at": "2026-04-14T19:34:07.336Z"
+}

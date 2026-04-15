@@ -1,0 +1,97 @@
+{
+  "bug_id": 15,
+  "bug_slug": "rate_limit_429",
+  "component": "api",
+  "error_type": "network_error",
+  "original_title": "Rapid request stress test: 10 requests fired",
+  "original_description": "Fired 10 rapid API requests to test rate limiting behavior. Response statuses: 200, 200, 200, 200, 200, 200, 200, 200, 200, 200. The network logs capture the full burst pattern.",
+  "report": {
+    "console": [
+      {
+        "level": "log",
+        "message": "[BuggyApp] BugSpotter SDK initialized",
+        "timestamp": 1776195252643
+      },
+      {
+        "level": "log",
+        "message": "[API] Sending rapid requests...",
+        "timestamp": 1776195254170
+      },
+      {
+        "level": "log",
+        "message": "[API] Request 1/10",
+        "timestamp": 1776195254170
+      },
+      {
+        "level": "log",
+        "message": "[API] Request 2/10",
+        "timestamp": 1776195254226
+      },
+      {
+        "level": "log",
+        "message": "[API] Request 3/10",
+        "timestamp": 1776195254260
+      },
+      {
+        "level": "log",
+        "message": "[API] Request 4/10",
+        "timestamp": 1776195254313
+      },
+      {
+        "level": "log",
+        "message": "[API] Request 5/10",
+        "timestamp": 1776195254350
+      },
+      {
+        "level": "log",
+        "message": "[API] Request 6/10",
+        "timestamp": 1776195254391
+      },
+      {
+        "level": "log",
+        "message": "[API] Request 7/10",
+        "timestamp": 1776195254443
+      },
+      {
+        "level": "log",
+        "message": "[API] Request 8/10",
+        "timestamp": 1776195254483
+      },
+      {
+        "level": "log",
+        "message": "[API] Request 9/10",
+        "timestamp": 1776195254522
+      },
+      {
+        "level": "log",
+        "message": "[API] Request 10/10",
+        "timestamp": 1776195254560
+      },
+      {
+        "level": "error",
+        "message": "[API] Rapid request test: 10 requests, statuses: 200, 200, 200, 200, 200, 200, 200, 200, 200, 200",
+        "timestamp": 1776195254597,
+        "stack": "    at console.<computed> [as error] (https://cdn.bugspotter.io/sdk/bugspotter-latest.min.js:2:108213)\n    at trigger429 (https://demo.kz.bugspotter.io/buggy-app.html:1416:19)\n    at async <anonymous>:328:30"
+      },
+      {
+        "level": "error",
+        "message": "[API] Rate limit test: Rapid request stress test: 10 requests in quick succession (statuses: 200, 200, 200, 200, 200, 200, 200, 200, 200, 200)",
+        "timestamp": 1776195254598,
+        "stack": "    at console.<computed> [as error] (https://cdn.bugspotter.io/sdk/bugspotter-latest.min.js:2:108213)\n    at trigger429 (https://demo.kz.bugspotter.io/buggy-app.html:1444:19)\n    at async <anonymous>:328:30"
+      }
+    ],
+    "network": [],
+    "metadata": {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/[REDACTED-IP] Safari/537.36",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "browser": "Chrome",
+      "os": "Windows",
+      "url": "https://demo.kz.bugspotter.io/buggy-app.html",
+      "timestamp": 1776195254598
+    }
+  },
+  "captured_at": "2026-04-14T19:34:25.111Z"
+}

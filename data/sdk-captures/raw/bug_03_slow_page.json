@@ -1,0 +1,40 @@
+{
+  "bug_id": 3,
+  "bug_slug": "slow_page",
+  "component": "orders",
+  "error_type": "performance",
+  "original_title": "Slow page load: Orders took 4.0s",
+  "original_description": "The Orders page took over 4 seconds to load. Performance threshold is 1000ms. Users experience a blocking spinner during this time, leading to poor UX and potential abandonment.",
+  "report": {
+    "console": [
+      {
+        "level": "log",
+        "message": "[BuggyApp] BugSpotter SDK initialized",
+        "timestamp": 1776195140819
+      },
+      {
+        "level": "log",
+        "message": "[Orders] Navigating to orders page...",
+        "timestamp": 1776195142455
+      },
+      {
+        "level": "warn",
+        "message": "[Orders] Slow page load: 4012ms (threshold: 1000ms)",
+        "timestamp": 1776195146469
+      }
+    ],
+    "network": [],
+    "metadata": {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/[REDACTED-IP] Safari/537.36",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "browser": "Chrome",
+      "os": "Windows",
+      "url": "https://demo.kz.bugspotter.io/buggy-app.html",
+      "timestamp": 1776195146479
+    }
+  },
+  "captured_at": "2026-04-14T19:32:32.851Z"
+}

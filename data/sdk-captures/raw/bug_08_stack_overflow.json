@@ -1,0 +1,526 @@
+{
+  "bug_id": 8,
+  "bug_slug": "stack_overflow",
+  "component": "feed",
+  "error_type": "js_error",
+  "original_title": "Stack overflow in component render",
+  "original_description": "A recursive component update triggers infinite re-rendering. The call stack exceeds the maximum size, crashing the page. Likely caused by a state update inside a render cycle.",
+  "report": {
+    "console": [
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9436",
+        "timestamp": 1776195192048
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9437",
+        "timestamp": 1776195192049
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9438",
+        "timestamp": 1776195192050
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9439",
+        "timestamp": 1776195192050
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9440",
+        "timestamp": 1776195192051
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9441",
+        "timestamp": 1776195192052
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9442",
+        "timestamp": 1776195192053
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9443",
+        "timestamp": 1776195192054
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9444",
+        "timestamp": 1776195192055
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9445",
+        "timestamp": 1776195192055
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9446",
+        "timestamp": 1776195192057
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9447",
+        "timestamp": 1776195192058
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9448",
+        "timestamp": 1776195192058
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9449",
+        "timestamp": 1776195192059
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9450",
+        "timestamp": 1776195192059
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9451",
+        "timestamp": 1776195192060
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9452",
+        "timestamp": 1776195192061
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9453",
+        "timestamp": 1776195192062
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9454",
+        "timestamp": 1776195192063
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9455",
+        "timestamp": 1776195192063
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9456",
+        "timestamp": 1776195192064
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9457",
+        "timestamp": 1776195192068
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9458",
+        "timestamp": 1776195192071
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9459",
+        "timestamp": 1776195192072
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9460",
+        "timestamp": 1776195192076
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9461",
+        "timestamp": 1776195192079
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9462",
+        "timestamp": 1776195192081
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9463",
+        "timestamp": 1776195192086
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9464",
+        "timestamp": 1776195192090
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9465",
+        "timestamp": 1776195192091
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9466",
+        "timestamp": 1776195192093
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9467",
+        "timestamp": 1776195192093
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9468",
+        "timestamp": 1776195192094
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9469",
+        "timestamp": 1776195192095
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9470",
+        "timestamp": 1776195192095
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9471",
+        "timestamp": 1776195192096
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9472",
+        "timestamp": 1776195192097
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9473",
+        "timestamp": 1776195192098
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9474",
+        "timestamp": 1776195192099
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9475",
+        "timestamp": 1776195192099
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9476",
+        "timestamp": 1776195192100
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9477",
+        "timestamp": 1776195192101
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9478",
+        "timestamp": 1776195192102
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9479",
+        "timestamp": 1776195192103
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9480",
+        "timestamp": 1776195192104
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9481",
+        "timestamp": 1776195192106
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9482",
+        "timestamp": 1776195192107
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9483",
+        "timestamp": 1776195192108
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9484",
+        "timestamp": 1776195192108
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9485",
+        "timestamp": 1776195192109
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9486",
+        "timestamp": 1776195192110
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9487",
+        "timestamp": 1776195192111
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9488",
+        "timestamp": 1776195192112
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9489",
+        "timestamp": 1776195192113
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9490",
+        "timestamp": 1776195192116
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9491",
+        "timestamp": 1776195192121
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9492",
+        "timestamp": 1776195192130
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9493",
+        "timestamp": 1776195192133
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9494",
+        "timestamp": 1776195192135
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9495",
+        "timestamp": 1776195192136
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9496",
+        "timestamp": 1776195192137
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9497",
+        "timestamp": 1776195192137
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9498",
+        "timestamp": 1776195192138
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9499",
+        "timestamp": 1776195192139
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9500",
+        "timestamp": 1776195192140
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9501",
+        "timestamp": 1776195192141
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9502",
+        "timestamp": 1776195192141
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9503",
+        "timestamp": 1776195192142
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9504",
+        "timestamp": 1776195192143
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9505",
+        "timestamp": 1776195192144
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9506",
+        "timestamp": 1776195192146
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9507",
+        "timestamp": 1776195192146
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9508",
+        "timestamp": 1776195192147
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9509",
+        "timestamp": 1776195192148
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9510",
+        "timestamp": 1776195192150
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9511",
+        "timestamp": 1776195192151
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9512",
+        "timestamp": 1776195192153
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9513",
+        "timestamp": 1776195192154
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9514",
+        "timestamp": 1776195192155
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9515",
+        "timestamp": 1776195192156
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9516",
+        "timestamp": 1776195192157
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9517",
+        "timestamp": 1776195192157
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9518",
+        "timestamp": 1776195192158
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9519",
+        "timestamp": 1776195192160
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9520",
+        "timestamp": 1776195192161
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9521",
+        "timestamp": 1776195192161
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9522",
+        "timestamp": 1776195192163
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9523",
+        "timestamp": 1776195192165
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9524",
+        "timestamp": 1776195192168
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9525",
+        "timestamp": 1776195192169
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9526",
+        "timestamp": 1776195192171
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9527",
+        "timestamp": 1776195192171
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9528",
+        "timestamp": 1776195192175
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9529",
+        "timestamp": 1776195192179
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9530",
+        "timestamp": 1776195192180
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9531",
+        "timestamp": 1776195192181
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9532",
+        "timestamp": 1776195192182
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9533",
+        "timestamp": 1776195192183
+      },
+      {
+        "level": "log",
+        "message": "[Render] Rendering at depth 9534",
+        "timestamp": 1776195192185
+      },
+      {
+        "level": "error",
+        "message": "[Render] Stack overflow: Maximum call stack size exceeded",
+        "timestamp": 1776195192192,
+        "stack": "    at console.<computed> [as error] (https://cdn.bugspotter.io/sdk/bugspotter-latest.min.js:2:108213)\n    at triggerStackOverflow (https://demo.kz.bugspotter.io/buggy-app.html:1235:19)\n    at eval (eval at evaluate (:302:30), <anonymous>:1:1)\n    at eval (<anonymous>)\n    at UtilityScript.evaluate (<anonymous>:302:30)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+      }
+    ],
+    "network": [],
+    "metadata": {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/[REDACTED-IP] Safari/537.36",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "browser": "Chrome",
+      "os": "Windows",
+      "url": "https://demo.kz.bugspotter.io/buggy-app.html",
+      "timestamp": 1776195192197
+    }
+  },
+  "captured_at": "2026-04-14T19:33:19.633Z"
+}

@@ -1,0 +1,41 @@
+{
+  "bug_id": 16,
+  "bug_slug": "websocket_fail",
+  "component": "websocket",
+  "error_type": "network_error",
+  "original_title": "WebSocket connection failed",
+  "original_description": "The app failed to establish a WebSocket connection to the notification service at wss://invalid-ws-host.example.com. Real-time updates are unavailable. Users will not receive live notifications.",
+  "report": {
+    "console": [
+      {
+        "level": "log",
+        "message": "[BuggyApp] BugSpotter SDK initialized",
+        "timestamp": 1776195265364
+      },
+      {
+        "level": "log",
+        "message": "[WebSocket] Connecting to notification service...",
+        "timestamp": 1776195266912
+      },
+      {
+        "level": "error",
+        "message": "[WebSocket] Error: WebSocket connection timed out",
+        "timestamp": 1776195271932,
+        "stack": "    at console.<computed> [as error] (https://cdn.bugspotter.io/sdk/bugspotter-latest.min.js:2:108213)\n    at triggerWebSocketFail (https://demo.kz.bugspotter.io/buggy-app.html:1478:19)\n    at async <anonymous>:328:30"
+      }
+    ],
+    "network": [],
+    "metadata": {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/[REDACTED-IP] Safari/537.36",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "browser": "Chrome",
+      "os": "Windows",
+      "url": "https://demo.kz.bugspotter.io/buggy-app.html",
+      "timestamp": 1776195271935
+    }
+  },
+  "captured_at": "2026-04-14T19:34:40.201Z"
+}

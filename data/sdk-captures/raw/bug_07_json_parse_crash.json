@@ -1,0 +1,46 @@
+{
+  "bug_id": 7,
+  "bug_slug": "json_parse_crash",
+  "component": "api",
+  "error_type": "js_error",
+  "original_title": "JSON parse crash: Expected property name or '}' in JSON at position 27 (line 1 column 28)",
+  "original_description": "The /api/user/preferences endpoint returned malformed JSON. The app crashes when trying to parse the response body. This breaks the settings page entirely.",
+  "report": {
+    "console": [
+      {
+        "level": "log",
+        "message": "[BuggyApp] BugSpotter SDK initialized",
+        "timestamp": 1776195171947
+      },
+      {
+        "level": "log",
+        "message": "[API] Fetching user preferences...",
+        "timestamp": 1776195173584
+      },
+      {
+        "level": "log",
+        "message": "[API] Raw response body: {\"user\": \"jane\", \"prefs\": {broken",
+        "timestamp": 1776195173593
+      },
+      {
+        "level": "error",
+        "message": "[API] JSON parse failed: Expected property name or '}' in JSON at position 27 (line 1 column 28)",
+        "timestamp": 1776195173608,
+        "stack": "    at console.<computed> [as error] (https://cdn.bugspotter.io/sdk/bugspotter-latest.min.js:2:108213)\n    at triggerJsonParseCrash (https://demo.kz.bugspotter.io/buggy-app.html:1211:19)\n    at eval (eval at evaluate (:302:30), <anonymous>:1:1)\n    at eval (<anonymous>)\n    at UtilityScript.evaluate (<anonymous>:302:30)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+      }
+    ],
+    "network": [],
+    "metadata": {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/[REDACTED-IP] Safari/537.36",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "browser": "Chrome",
+      "os": "Windows",
+      "url": "https://demo.kz.bugspotter.io/buggy-app.html",
+      "timestamp": 1776195173618
+    }
+  },
+  "captured_at": "2026-04-14T19:32:58.304Z"
+}

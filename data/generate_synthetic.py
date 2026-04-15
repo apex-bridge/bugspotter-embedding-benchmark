@@ -1,8 +1,9 @@
 """
-Generate synthetic bug reports and paraphrases for the embedding benchmark.
+Generate combined bug report dataset for the embedding benchmark.
 
-Source 2: 200 synthetic reports (20 archetypes x 10 variations each)
-Source 3: 100 BugSpotter-native captures from a test SPA
+Source 1: ~100 GitHub issues (vocabulary diversity, negative pairs)
+Source 2: 300 synthetic reports (30 archetypes x 10 variations each)
+Source 3: 250 real SDK captures (25 bugs x 10 description variations)
 
 Paraphrases are AGGRESSIVE — different structure, vocabulary, detail level —
 so embedding models must understand semantics, not just word overlap.
@@ -251,6 +252,118 @@ ARCHETYPES = [
         "error_type": "react_specific",
         "component": "profile",
     },
+    # --- 10 new archetypes (v2) ---
+    {
+        "archetype_id": "clipboard_paste_crash",
+        "title": "App crashes when pasting rich text into plain text field",
+        "description": "Pasting formatted text from Word/Google Docs into the name field causes a TypeError. The input handler tries to strip HTML but crashes on unexpected clipboard content.",
+        "console_logs": ["[error] TypeError: Cannot read properties of undefined (reading 'replace')", "[warn] ClipboardEvent: text/html content detected in plain text field"],
+        "stack_trace": "TypeError: Cannot read properties of undefined (reading 'replace')\n    at handlePaste (forms.js:142)\n    at HTMLInputElement.onpaste (forms.js:89)",
+        "url": "/settings/profile",
+        "browser": "Chrome 124",
+        "error_type": "js_error",
+        "component": "forms",
+    },
+    {
+        "archetype_id": "notification_permission",
+        "title": "Push notification permission prompt fires on every page load",
+        "description": "The browser notification permission dialog appears on every page load, even after the user clicks 'Block'. The app doesn't check Notification.permission before calling requestPermission().",
+        "console_logs": ["[warn] Notification permission already denied, but requestPermission() called again", "[info] Requesting notification permission..."],
+        "stack_trace": None,
+        "url": "/",
+        "browser": "Firefox 125",
+        "error_type": "ui_interaction",
+        "component": "notifications",
+    },
+    {
+        "archetype_id": "table_sort_nan",
+        "title": "Table column sort shows NaN for mixed numeric/string data",
+        "description": "Sorting the 'Amount' column in the transactions table shows NaN values. Some cells contain '$1,234' (formatted string) and the sort comparator calls parseFloat directly without stripping currency symbols.",
+        "console_logs": ["[warn] NaN detected in sort comparator for column 'amount'", "[error] Invalid numeric value: '$1,234'"],
+        "stack_trace": None,
+        "url": "/admin/transactions",
+        "browser": "Chrome 124",
+        "error_type": "js_error",
+        "component": "table",
+    },
+    {
+        "archetype_id": "geolocation_timeout",
+        "title": "Map shows wrong location — geolocation API timed out silently",
+        "description": "The store locator map defaults to New York instead of the user's actual location. The Geolocation API call times out after 10 seconds but there's no error UI — just a silent fallback to the default coordinates.",
+        "console_logs": ["[error] Geolocation error: Timeout expired", "[warn] Falling back to default coordinates (40.7128, -74.0060)"],
+        "network_logs": [{"method": "GET", "url": "/api/stores/nearby?lat=40.7128&lng=-74.0060", "status": 200, "duration": 340}],
+        "stack_trace": None,
+        "url": "/stores",
+        "browser": "Safari 17",
+        "error_type": "network_error",
+        "component": "map",
+    },
+    {
+        "archetype_id": "pdf_export_blank",
+        "title": "PDF export generates blank pages for reports longer than 2 pages",
+        "description": "Exporting a report to PDF works for short reports but produces blank pages after page 2. The html2canvas library fails to capture content below the viewport fold.",
+        "console_logs": ["[error] html2canvas: Unable to clone element outside viewport", "[warn] PDF page 3 rendered with zero content height"],
+        "stack_trace": None,
+        "url": "/reports/export",
+        "browser": "Chrome 124",
+        "error_type": "js_error",
+        "component": "export",
+    },
+    {
+        "archetype_id": "drag_drop_ghost",
+        "title": "Drag ghost image persists after drop — covers content",
+        "description": "When dragging a card on the kanban board, the ghost/preview image stays visible after the drop completes. It floats over other cards and blocks interaction until page reload.",
+        "console_logs": ["[error] DragEvent: dragend fired but ghost element not cleaned up", "[warn] Orphaned drag preview element detected in DOM"],
+        "stack_trace": None,
+        "url": "/board",
+        "browser": "Firefox 125",
+        "error_type": "css_ui",
+        "component": "kanban",
+    },
+    {
+        "archetype_id": "password_reveal_crash",
+        "title": "Toggle password visibility crashes when password field is empty",
+        "description": "Clicking the 'show password' eye icon on an empty password field throws a TypeError. The toggle handler reads .value.length but the value is null when the field hasn't been touched.",
+        "console_logs": ["[error] TypeError: Cannot read properties of null (reading 'length')", "[info] Password visibility toggled"],
+        "stack_trace": "TypeError: Cannot read properties of null (reading 'length')\n    at togglePasswordVisibility (auth.js:67)\n    at HTMLButtonElement.onclick (auth.js:23)",
+        "url": "/login",
+        "browser": "Chrome 124",
+        "error_type": "js_error",
+        "component": "auth",
+    },
+    {
+        "archetype_id": "video_autoplay_blocked",
+        "title": "Hero video shows black rectangle — autoplay blocked by browser",
+        "description": "The homepage hero video doesn't play — it shows a black rectangle with no controls. Chrome blocks autoplay with sound, and the app doesn't handle the rejected play() promise or show a fallback poster image.",
+        "console_logs": ["[error] DOMException: play() failed because the user didn't interact with the document first", "[warn] Unhandled promise rejection from video.play()"],
+        "stack_trace": None,
+        "url": "/",
+        "browser": "Chrome 124",
+        "error_type": "ui_interaction",
+        "component": "media",
+    },
+    {
+        "archetype_id": "chart_resize_overflow",
+        "title": "Dashboard chart overflows container on window resize",
+        "description": "Resizing the browser window causes the revenue chart to extend beyond its card container, overlapping adjacent widgets. The chart library doesn't respond to resize events, and the container has no overflow:hidden.",
+        "console_logs": ["[warn] Chart width (1200px) exceeds container width (800px)", "[warn] ResizeObserver loop completed with undelivered notifications"],
+        "stack_trace": None,
+        "url": "/dashboard",
+        "browser": "Firefox 125",
+        "error_type": "css_ui",
+        "component": "dashboard",
+    },
+    {
+        "archetype_id": "service_worker_stale",
+        "title": "App shows outdated content after deploy — service worker cache stale",
+        "description": "Users report seeing old UI and stale data after a new deploy. The service worker aggressively caches all routes and doesn't invalidate on new versions. Hard refresh (Ctrl+Shift+R) fixes it.",
+        "console_logs": ["[warn] Service worker serving cached response for /api/config (cache age: 72h)", "[info] ServiceWorker: no update found (stale-while-revalidate)"],
+        "stack_trace": None,
+        "url": "/",
+        "browser": "Chrome 124",
+        "error_type": "state_management",
+        "component": "cache",
+    },
 ]
 
 # ---------------------------------------------------------------------------
@@ -480,6 +593,117 @@ DEEP_PARAPHRASES = {
         {"title": "Profile page: useEffect → setState → re-render → loop", "description": "The profile edit component hits React's re-render limit. Root cause: useEffect dependency is an object literal (new reference each render)."},
         {"title": "useEffect infinite loop on profile edit — page freezes", "description": "Opening profile edit form freezes the page. Component re-renders thousands of times. useEffect dependency array has object recreated each render."},
     ],
+    # --- 10 new archetype paraphrases (v2) ---
+    "clipboard_paste_crash": [
+        {"title": "TypeError on paste: rich text handling fails in input field", "description": "Pasting HTML-formatted content from external apps into the name field triggers a crash. The paste handler's regex replace fails on undefined clipboard data."},
+        {"title": "Input field crashes when pasting from Word or Google Docs", "description": "The settings profile name field throws TypeError when pasting rich text. The onpaste handler doesn't sanitize clipboard HTML before processing."},
+        {"title": "Paste from clipboard kills the form", "description": "Copied text from a doc, pasted into name field, page crashed. Had to reload."},
+        {"title": "Form breaks when pasting formatted text", "description": "Pasting styled text into any plain input causes a JS error. Only plain text paste works."},
+        {"title": "pasteing from word into name feild crashes the page", "description": "i copied my name from a word doc and pasted it into the profile name box and the whole page broke"},
+        {"title": "Profile form unhandled exception on clipboard paste event", "description": "QA found that pasting rich text (text/html) from external applications into the name input triggers an unhandled TypeError in the paste event handler."},
+        {"title": "Paste handler crashes on HTML clipboard content", "description": "The form's paste event listener attempts to strip HTML tags but calls .replace() on undefined when ClipboardEvent returns unexpected content type."},
+        {"title": "Crash when paste text from document to input", "description": "When user paste formatted text from Word to name field, application crash. Error say cannot read replace of undefined."},
+        {"title": "Paste crash in profile form", "description": "Rich text paste into name field causes TypeError."},
+    ],
+    "notification_permission": [
+        {"title": "Browser notification prompt appears on every single page load", "description": "The notification permission dialog fires every time a page loads, even after being dismissed or blocked. The app calls requestPermission() without checking current permission state."},
+        {"title": "Repeated Notification.requestPermission() calls ignore user denial", "description": "The push notification module unconditionally requests permission on init, causing the browser prompt to reappear on every navigation despite the user having already denied it."},
+        {"title": "Notification popup won't stop appearing", "description": "Every page I visit shows the 'allow notifications' popup. Even after clicking Block it comes back."},
+        {"title": "Push notifications keep asking for permission", "description": "The browser keeps showing the notification permission dialog on every page. Super annoying."},
+        {"title": "notifcation permisson dialog pops up on evry page lod", "description": "the allow notifications popup keeps showing up no matter how many times i click block. happens on every page"},
+        {"title": "User reports: notification permission dialog is too aggressive", "description": "Multiple users complaining about the notification permission request appearing on every page load. The app should check Notification.permission before calling requestPermission()."},
+        {"title": "Notification permission: missing guard for denied/granted state", "description": "The notification initialization code calls requestPermission() unconditionally. When permission is 'denied', this causes the browser to show the blocked-prompt UI repeatedly."},
+        {"title": "Notification asking permission many time, user already say no", "description": "The notification dialog appear every page. User click block but it come back. Very annoying for users."},
+        {"title": "Notification prompt repeats on every page", "description": "requestPermission() called without checking Notification.permission state."},
+    ],
+    "table_sort_nan": [
+        {"title": "Sorting transactions by amount shows NaN in sorted column", "description": "Clicking the Amount column header to sort shows NaN values scattered through the table. The sort comparator uses parseFloat on currency-formatted strings like '$1,234.56'."},
+        {"title": "parseFloat fails on formatted currency in table sort", "description": "The transaction table's sort function passes currency strings directly to parseFloat without stripping $ and comma formatting, resulting in NaN comparisons."},
+        {"title": "NaN showing up when I sort the amount column", "description": "Clicked sort on Amount in the transactions table, half the values turned into NaN."},
+        {"title": "Table sort broken — amounts show NaN", "description": "The amount column doesn't sort properly. Values become NaN after clicking the header."},
+        {"title": "sorting transctions by ammount shows NaN everwhere", "description": "clicked the amount colum header and all the numbers turned to NaN. cant sort the table anymore"},
+        {"title": "Data integrity issue: NaN values appear in sorted transaction table", "description": "When sorting by Amount column, multiple rows display NaN. Root cause: parseFloat cannot handle '$' and ',' characters in the formatted currency values."},
+        {"title": "Sort comparator doesn't strip currency formatting before numeric parse", "description": "The table sort for the Amount column calls parseFloat on strings like '$1,234.56' which returns NaN. Need to strip non-numeric characters first."},
+        {"title": "Table show NaN when sort by amount, the dollar sign cause problem", "description": "When click sort on amount column, the values become NaN. I think because the values have dollar sign and comma."},
+        {"title": "Amount sort shows NaN", "description": "parseFloat fails on currency-formatted strings in table sort."},
+    ],
+    "geolocation_timeout": [
+        {"title": "Store locator defaults to NYC — geolocation silently fails", "description": "The store finder map always shows New York instead of the user's location. The Geolocation API times out but there's no error message or retry — just a silent fallback to hardcoded coordinates."},
+        {"title": "Geolocation timeout not handled: map falls back to default without notification", "description": "The getCurrentPosition call times out after 10s and triggers the error callback, which silently sets default coordinates instead of notifying the user or offering manual location entry."},
+        {"title": "Map always shows New York even though I'm in LA", "description": "The store locator never finds my actual location. Always defaults to NYC. No error shown."},
+        {"title": "Location not working on store finder", "description": "Map keeps showing the wrong city. My GPS is on but the app ignores it."},
+        {"title": "store locater map allways shows new york not my location", "description": "the find stores page never detects where i am. it just shows new york every time. no error mesage"},
+        {"title": "Users in non-NYC locations see incorrect store results", "description": "The store locator silently falls back to NYC coordinates when geolocation fails. Users outside NYC get irrelevant store results with no indication their location wasn't detected."},
+        {"title": "Geolocation error path: silent fallback to (40.71, -74.00) with no UI feedback", "description": "When navigator.geolocation.getCurrentPosition times out, the error handler sets default NYC coordinates without any user-facing notification or retry option."},
+        {"title": "Map not detect my location, always show default city", "description": "Store locator map never find my real location. Always show New York. No error message appear to user."},
+        {"title": "Geolocation times out, map shows wrong city", "description": "Silent fallback to NYC coordinates on geolocation timeout. No error UI."},
+    ],
+    "pdf_export_blank": [
+        {"title": "Exported PDF has blank pages after page 2", "description": "PDF export of long reports generates empty pages after the second page. html2canvas fails to capture content that's below the initial viewport."},
+        {"title": "html2canvas viewport limitation causes blank pages in PDF export", "description": "The PDF generation library only captures content within the viewport bounds. For reports longer than 2 pages, subsequent pages are rendered as blank white."},
+        {"title": "PDF export cuts off after 2 pages — rest is blank", "description": "Tried exporting a 5-page report to PDF. Pages 3-5 are completely blank. Short reports work fine."},
+        {"title": "Long reports export as mostly blank PDFs", "description": "Only the first 2 pages of the PDF have content. Everything after that is empty."},
+        {"title": "pdf exprot is blank after page 2, only works for short reporst", "description": "exported a long report and pages 3 onwards are all blank. short reports are fine tho"},
+        {"title": "Customer complaint: PDF exports of quarterly reports are incomplete", "description": "Reports longer than 2 pages produce PDFs with blank pages after the second page. The html2canvas capture doesn't scroll to capture below-fold content."},
+        {"title": "PDF renderer fails to capture off-screen content beyond viewport height", "description": "The PDF export pipeline uses html2canvas which only captures the visible viewport. Content below the fold on pages 3+ is not rendered, producing blank PDF pages."},
+        {"title": "PDF export make blank page for long report, short report is OK", "description": "When export long report to PDF, page after second is blank. Only short report that fit in screen work correct."},
+        {"title": "PDF blank after page 2", "description": "html2canvas can't capture content below viewport fold."},
+    ],
+    "drag_drop_ghost": [
+        {"title": "Kanban drag preview stays visible after card is dropped", "description": "The drag ghost image for kanban cards doesn't disappear after dropping. The translucent preview stays on screen and blocks interaction with underlying elements."},
+        {"title": "DragEvent cleanup missing: ghost element persists in DOM after dragend", "description": "The kanban board's drag-and-drop implementation doesn't clean up the ghost/preview element on dragend. The orphaned element remains in the DOM at the drop position."},
+        {"title": "Ghost card stays on screen after dropping in kanban", "description": "Drag a card to a new column, the ghost image stays floating there. Can't click anything under it."},
+        {"title": "Drag preview doesn't go away after drop", "description": "The translucent drag preview is stuck on screen after dropping a card. Need to refresh."},
+        {"title": "dragging cards on the board leaves ghost images that dont disapear", "description": "when i drag kanban cards the preview image stays after i drop it. it covers other cards and i cant click them"},
+        {"title": "Visual glitch: drag preview overlay blocks kanban board interaction", "description": "After drag-and-drop of kanban cards, the ghost preview element remains visible and intercepts clicks on cards beneath it. Only page reload clears it."},
+        {"title": "Kanban DnD: dragend handler doesn't remove preview clone from DOM", "description": "The drag ghost element created during dragstart is not removed in the dragend handler. It persists as an absolutely-positioned element covering board content."},
+        {"title": "Drag card ghost not disappear after drop, block other card", "description": "When drag kanban card and drop, the ghost image stay on screen. Cannot click card behind it. Must reload page."},
+        {"title": "Kanban drag ghost persists after drop", "description": "Ghost preview element not cleaned up on dragend. Blocks interaction."},
+    ],
+    "password_reveal_crash": [
+        {"title": "Show/hide password toggle throws TypeError on empty field", "description": "Clicking the eye icon to toggle password visibility crashes if the password field is empty. The toggle handler reads .value.length on a null reference."},
+        {"title": "TypeError in password visibility toggle when input is untouched", "description": "The password reveal button's click handler assumes the input value is always a string, but it's null when the field hasn't been interacted with, causing a TypeError."},
+        {"title": "Eye icon on password field crashes the form when empty", "description": "Click the show password icon with nothing typed — page crashes. Only happens on empty field."},
+        {"title": "Password toggle breaks if you haven't typed anything", "description": "The show/hide password button throws an error when the field is empty."},
+        {"title": "clicking show pasword icon crashes when pasword field emtpy", "description": "if you click the eye icon to show password before typing anything the page breaks with an error"},
+        {"title": "Login form: password visibility toggle fails on null input value", "description": "The password reveal feature throws TypeError when activated on an untouched password field. The handler doesn't null-check the input value before accessing .length."},
+        {"title": "Null reference in togglePasswordVisibility: input.value is null", "description": "The password field's toggle visibility handler crashes with TypeError when the field is empty/untouched because it reads .length on a null value."},
+        {"title": "Password eye button crash when field empty, error say null", "description": "Click show password button before type anything, page crash. Error message say cannot read length of null."},
+        {"title": "Password toggle crash on empty field", "description": "TypeError: null.length when toggling visibility on untouched password input."},
+    ],
+    "video_autoplay_blocked": [
+        {"title": "Homepage hero video is a black rectangle — autoplay silently blocked", "description": "The hero section video shows a black box because Chrome blocks autoplay with sound. The play() promise rejects but there's no fallback poster or play button."},
+        {"title": "Unhandled play() rejection: video autoplay fails without fallback UI", "description": "The homepage video element's play() call is rejected by the browser's autoplay policy. The unhandled rejection leaves a black rectangle with no user-facing controls or poster image."},
+        {"title": "Black box where the hero video should be", "description": "The video on the homepage just shows a black rectangle. No play button, no image, nothing."},
+        {"title": "Hero video doesn't play, just black", "description": "Homepage video shows a black box. Think it's an autoplay issue."},
+        {"title": "homepage video is just a black rectangel, nothing plays", "description": "the video at the top of the homepage is completly black. no play button or anything. looks broken"},
+        {"title": "Customer-facing: hero section appears broken with black video frame", "description": "The homepage hero video renders as a black rectangle on first visit because autoplay with sound is blocked. No poster image or manual play controls are shown as fallback."},
+        {"title": "Video autoplay policy: play() DOMException not caught, no poster fallback", "description": "The hero video's autoplay fails due to browser policy (no prior user interaction). The rejected play() promise is unhandled and no fallback UI (poster/play button) is provided."},
+        {"title": "Video on homepage not play, show black box, no button to click", "description": "Home page video show black rectangle only. Cannot play video. No button appear. Browser block autoplay."},
+        {"title": "Hero video black — autoplay blocked, no fallback", "description": "play() rejected, no poster image or play button shown."},
+    ],
+    "chart_resize_overflow": [
+        {"title": "Revenue chart overflows card container after browser resize", "description": "Resizing the browser window causes the dashboard revenue chart to extend beyond its container card, overlapping adjacent widgets. The chart library ignores window resize events."},
+        {"title": "Chart.js container overflow: ResizeObserver not triggering chart update", "description": "The dashboard chart doesn't respond to container size changes. On window resize, the canvas retains its original dimensions and overflows the card, overlapping neighboring elements."},
+        {"title": "Chart goes outside its box when I resize the window", "description": "Made my browser window smaller and the revenue chart spills over into the next widget."},
+        {"title": "Dashboard chart overflows on resize", "description": "The revenue chart extends past its card when resizing. Overlaps other widgets."},
+        {"title": "chart overflows its containr when resizing the browsr window", "description": "the revenue chart on the dashboard gets bigger than its box when i make the window smaller. covers other stuff"},
+        {"title": "Dashboard layout regression: chart widget overflows on viewport resize", "description": "The revenue chart component doesn't resize with its container. On window resize, the chart canvas exceeds the card dimensions and overlaps adjacent dashboard widgets."},
+        {"title": "Chart canvas ignores container resize: missing ResizeObserver or responsive option", "description": "The Chart.js instance on the dashboard isn't configured with responsive:true or a ResizeObserver. On window resize, the canvas maintains original dimensions and overflows."},
+        {"title": "Chart go outside container when change window size, overlap other widget", "description": "When resize browser window, the chart become bigger than card. It overlap other widget on dashboard. No fix until reload."},
+        {"title": "Chart overflow on window resize", "description": "Dashboard chart extends past container, overlaps widgets."},
+    ],
+    "service_worker_stale": [
+        {"title": "Users see old UI after deploy — service worker serves cached version", "description": "After deploying new features, users report seeing the old interface. The service worker's aggressive cache-first strategy doesn't invalidate on version changes. Hard refresh fixes it."},
+        {"title": "Stale service worker cache: no versioning or cache-busting strategy", "description": "The service worker caches all routes with a stale-while-revalidate policy but never invalidates the cache on new deployments. Users are stuck on old versions until they manually clear cache."},
+        {"title": "Deployed new version but users still see old one", "description": "Pushed a deploy with new features but nobody sees them. Have to tell everyone to Ctrl+Shift+R."},
+        {"title": "Service worker caching too aggressively after deploy", "description": "New deployments don't reach users because the SW keeps serving old cached content."},
+        {"title": "users see old version of app after we depoly new one, have to hard refesh", "description": "we deployed new features but users still see the old version. only ctrl shift r fixes it. service worker problem"},
+        {"title": "Post-deployment issue: cached content not invalidated by service worker", "description": "After each deployment, customer support receives reports of users seeing stale UI. The service worker caches aggressively with no version-aware invalidation strategy."},
+        {"title": "Service worker: stale-while-revalidate without version hash causes post-deploy staleness", "description": "The SW caches all routes including /api/config with stale-while-revalidate but has no mechanism to detect new deployments. Cached responses persist for 72+ hours."},
+        {"title": "After deploy, user see old page because service worker cache not update", "description": "When we deploy new version, users still see old interface. Service worker keep old cache. User must hard refresh browser."},
+        {"title": "SW serves stale content after deploy", "description": "Service worker cache-first strategy has no version invalidation."},
+    ],
 }
 
 
@@ -510,13 +734,14 @@ def truncate_description(text, keep_ratio=0.5):
 
 
 # ---------------------------------------------------------------------------
-# BugSpotter-native captures — simulated SDK output from a test SPA
-# These share components/errors with archetypes to create HARD negatives
+# Note: BugSpotter SDK captures are now real data collected via Playwright
+# from the demo app. See collect_sdk_captures.js + convert_sdk_to_benchmark.py
+# The old hand-written BUGSPOTTER_CAPTURES have been removed.
 # ---------------------------------------------------------------------------
 
-BUGSPOTTER_CAPTURES = [
-    # These bugs are in the SAME components as archetypes but are DIFFERENT bugs
-    # This creates natural hard negatives (D3)
+_OLD_CAPTURES_REMOVED = True  # See sdk_captures.json for real SDK data
+
+_PLACEHOLDER = [
     {"id": "bs_000", "title": "Checkout total shows NaN after removing last item",
      "description": "Remove the only item from cart while on checkout page. The total displays NaN. The price calculation doesn't handle empty cart edge case.",
      "console_logs": ["TypeError: Cannot read properties of undefined (reading 'price')"],
@@ -804,28 +1029,35 @@ def main():
     random.seed(args.seed)
     all_reports = []
 
-    # Source 1: GitHub issues (already scraped)
+    # Source 1: GitHub issues (already scraped — 100 for vocab diversity)
     if os.path.exists(args.github_input):
         with open(args.github_input, "r", encoding="utf-8") as f:
             github_reports = json.load(f)
+        github_reports = github_reports[:100]
         print(f"Loaded {len(github_reports)} GitHub issues from {args.github_input}")
-        all_reports.extend(github_reports[:300])
+        all_reports.extend(github_reports)
     else:
         print(f"WARNING: {args.github_input} not found. Run scrape_github.py first.")
 
-    # Source 2: Synthetic bug reports (20 archetypes x 10 variations)
+    # Source 2: Synthetic bug reports (30 archetypes x 10 variations)
     synthetic_reports = []
     for archetype in ARCHETYPES:
         for v in range(10):  # 0 = original, 1-9 = paraphrases
             report = generate_archetype_report(archetype, v)
             synthetic_reports.append(report)
 
-    print(f"Generated {len(synthetic_reports)} synthetic reports (20 archetypes x 10 variations)")
+    print(f"Generated {len(synthetic_reports)} synthetic reports ({len(ARCHETYPES)} archetypes x 10 variations)")
     all_reports.extend(synthetic_reports)
 
-    # Source 3: BugSpotter-native captures
-    print(f"Generated {len(BUGSPOTTER_CAPTURES)} BugSpotter-native captures")
-    all_reports.extend(BUGSPOTTER_CAPTURES)
+    # Source 3: Real SDK captures (25 bugs x 10 variations — from collect_sdk_captures.js)
+    sdk_path = os.path.join(os.path.dirname(args.output) or "data", "sdk_captures.json")
+    if os.path.exists(sdk_path):
+        with open(sdk_path, "r", encoding="utf-8") as f:
+            sdk_reports = json.load(f)
+        print(f"Loaded {len(sdk_reports)} real SDK captures from {sdk_path}")
+        all_reports.extend(sdk_reports)
+    else:
+        print(f"WARNING: {sdk_path} not found. Run collect_sdk_captures.js + convert_sdk_to_benchmark.py first.")
 
     # Save combined dataset
     os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)

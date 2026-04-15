@@ -1,0 +1,51 @@
+{
+  "bug_id": 11,
+  "bug_slug": "invalid_date",
+  "component": "datepicker",
+  "error_type": "js_error",
+  "original_title": "Invalid date crash: Invalid time value",
+  "original_description": "The date picker accepts free-text input without validation. Entering \"2024-13-45\" creates an Invalid Date object, and calling toISOString() throws a RangeError.",
+  "report": {
+    "console": [
+      {
+        "level": "log",
+        "message": "[BuggyApp] BugSpotter SDK initialized",
+        "timestamp": 1776195214766
+      },
+      {
+        "level": "log",
+        "message": "[DatePicker] Parsing selected date...",
+        "timestamp": 1776195216601
+      },
+      {
+        "level": "log",
+        "message": "[DatePicker] User entered: 2024-13-45",
+        "timestamp": 1776195216602
+      },
+      {
+        "level": "log",
+        "message": "[DatePicker] Parsed date object: {}",
+        "timestamp": 1776195216603
+      },
+      {
+        "level": "error",
+        "message": "[DatePicker] Date format error: Invalid time value",
+        "timestamp": 1776195216604,
+        "stack": "    at console.<computed> [as error] (https://cdn.bugspotter.io/sdk/bugspotter-latest.min.js:2:108213)\n    at triggerInvalidDate (https://demo.kz.bugspotter.io/buggy-app.html:1305:19)\n    at eval (eval at evaluate (:302:30), <anonymous>:1:1)\n    at eval (<anonymous>)\n    at UtilityScript.evaluate (<anonymous>:302:30)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+      }
+    ],
+    "network": [],
+    "metadata": {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/[REDACTED-IP] Safari/537.36",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "browser": "Chrome",
+      "os": "Windows",
+      "url": "https://demo.kz.bugspotter.io/buggy-app.html",
+      "timestamp": 1776195216607
+    }
+  },
+  "captured_at": "2026-04-14T19:33:40.881Z"
+}

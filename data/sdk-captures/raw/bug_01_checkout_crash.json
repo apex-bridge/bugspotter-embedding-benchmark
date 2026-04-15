@@ -1,0 +1,56 @@
+{
+  "bug_id": 1,
+  "bug_slug": "checkout_crash",
+  "component": "checkout",
+  "error_type": "js_error",
+  "original_title": "Checkout payment crash: Cannot read properties of undefined (reading 'processPayment')",
+  "original_description": "The checkout form crashed when processing payment. TypeError thrown because paymentProcessor is undefined. User was on the checkout page with a filled form.",
+  "report": {
+    "console": [
+      {
+        "level": "log",
+        "message": "[BuggyApp] BugSpotter SDK initialized",
+        "timestamp": 1776194725392
+      },
+      {
+        "level": "log",
+        "message": "[Checkout] Processing payment for [REDACTED-EMAIL]",
+        "timestamp": 1776194727430
+      },
+      {
+        "level": "log",
+        "message": "[Checkout] Billing card: [REDACTED-CREDITCARD]",
+        "timestamp": 1776194727431
+      },
+      {
+        "level": "log",
+        "message": "[Checkout] Phone: +1 [REDACTED-PHONE]",
+        "timestamp": 1776194727431
+      },
+      {
+        "level": "log",
+        "message": "[Checkout] IIN: [REDACTED-IIN]",
+        "timestamp": 1776194727431
+      },
+      {
+        "level": "error",
+        "message": "[Checkout] Payment crashed for [REDACTED-EMAIL]: Cannot read properties of undefined (reading 'processPayment')",
+        "timestamp": 1776194727431,
+        "stack": "    at console.<computed> [as error] (https://cdn.bugspotter.io/sdk/bugspotter-latest.min.js:2:108213)\n    at https://demo.kz.bugspotter.io/buggy-app.html:1043:21"
+      }
+    ],
+    "network": [],
+    "metadata": {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/[REDACTED-IP] Safari/537.36",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "browser": "Chrome",
+      "os": "Windows",
+      "url": "https://demo.kz.bugspotter.io/buggy-app.html",
+      "timestamp": 1776194727432
+    }
+  },
+  "captured_at": "2026-04-14T19:25:28.937Z"
+}

@@ -1,0 +1,25 @@
+{
+  "name": "bugspotter-embedding-benchmark",
+  "version": "1.0.0",
+  "description": "We benchmarked 6 self-hosted embedding models for duplicate bug report detection. All models run locally via [Ollama](https://ollama.com/) on a single CPU server (€25/mo). No data leaves your network.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/apex-bridge/bugspotter-embedding-benchmark.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/apex-bridge/bugspotter-embedding-benchmark/issues"
+  },
+  "homepage": "https://github.com/apex-bridge/bugspotter-embedding-benchmark#readme",
+  "dependencies": {
+    "http-server": "^14.1.1",
+    "playwright": "^1.59.1"
+  }
+}

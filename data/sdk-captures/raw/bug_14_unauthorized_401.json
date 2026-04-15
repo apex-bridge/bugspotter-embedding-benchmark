@@ -1,0 +1,49 @@
+{
+  "bug_id": 14,
+  "bug_slug": "unauthorized_401",
+  "component": "auth",
+  "error_type": "network_error",
+  "original_title": "401 Unauthorized: authentication failed",
+  "original_description": "Request to protected endpoint returned 401. The bearer token has expired or is invalid. User is unable to access their data until they re-authenticate.",
+  "report": {
+    "console": [
+      {
+        "level": "log",
+        "message": "[BuggyApp] BugSpotter SDK initialized",
+        "timestamp": 1776195247441
+      },
+      {
+        "level": "log",
+        "message": "[Auth] Accessing protected resource...",
+        "timestamp": 1776195248971
+      },
+      {
+        "level": "error",
+        "message": "[Auth] Authentication failed: Server returned 404 ",
+        "timestamp": 1776195249016,
+        "stack": "    at console.<computed> [as error] (https://cdn.bugspotter.io/sdk/bugspotter-latest.min.js:2:108213)\n    at trigger401 (https://demo.kz.bugspotter.io/buggy-app.html:1384:19)\n    at async <anonymous>:328:30"
+      }
+    ],
+    "network": [
+      {
+        "url": "https://api.kz.bugspotter.io/api/bugs",
+        "method": "GET",
+        "status": 404,
+        "duration": 45,
+        "timestamp": 1776195248971
+      }
+    ],
+    "metadata": {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/[REDACTED-IP] Safari/537.36",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "browser": "Chrome",
+      "os": "Windows",
+      "url": "https://demo.kz.bugspotter.io/buggy-app.html",
+      "timestamp": 1776195249017
+    }
+  },
+  "captured_at": "2026-04-14T19:34:12.555Z"
+}

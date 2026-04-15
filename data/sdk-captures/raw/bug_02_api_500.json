@@ -1,0 +1,49 @@
+{
+  "bug_id": 2,
+  "bug_slug": "api_500",
+  "component": "product",
+  "error_type": "network_error",
+  "original_title": "Product API failure: API returned 404 ",
+  "original_description": "The /products endpoint returned an error when loading the product list. This blocks the entire product page from rendering. The user sees no products.",
+  "report": {
+    "console": [
+      {
+        "level": "log",
+        "message": "[BuggyApp] BugSpotter SDK initialized",
+        "timestamp": 1776195132201
+      },
+      {
+        "level": "log",
+        "message": "[Products] Fetching product list...",
+        "timestamp": 1776195133787
+      },
+      {
+        "level": "error",
+        "message": "[Products] API request failed: API returned 404 ",
+        "timestamp": 1776195133914,
+        "stack": "    at console.<computed> [as error] (https://cdn.bugspotter.io/sdk/bugspotter-latest.min.js:2:108213)\n    at triggerApi500 (https://demo.kz.bugspotter.io/buggy-app.html:1075:19)\n    at async <anonymous>:328:30"
+      }
+    ],
+    "network": [
+      {
+        "url": "https://api.kz.bugspotter.io/products?limit=50",
+        "method": "GET",
+        "status": 404,
+        "duration": 122,
+        "timestamp": 1776195133790
+      }
+    ],
+    "metadata": {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/[REDACTED-IP] Safari/537.36",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "browser": "Chrome",
+      "os": "Windows",
+      "url": "https://demo.kz.bugspotter.io/buggy-app.html",
+      "timestamp": 1776195133917
+    }
+  },
+  "captured_at": "2026-04-14T19:32:20.593Z"
+}

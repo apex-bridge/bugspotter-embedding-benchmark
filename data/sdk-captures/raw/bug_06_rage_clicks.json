@@ -1,0 +1,35 @@
+{
+  "bug_id": 6,
+  "bug_slug": "rage_clicks",
+  "component": "orders",
+  "error_type": "ui_interaction",
+  "original_title": "Rage clicks detected: user clicked \"Submit Order\" 6 times",
+  "original_description": "The \"Submit Order\" button appears to do nothing, causing the user to click it 6 times in frustration. This is a strong signal of a UX issue. The session replay captures the rage click pattern.",
+  "report": {
+    "console": [
+      {
+        "level": "log",
+        "message": "[BuggyApp] BugSpotter SDK initialized",
+        "timestamp": 1776195164501
+      },
+      {
+        "level": "warn",
+        "message": "[UX] Rage clicks detected: 6 clicks on unresponsive button",
+        "timestamp": 1776195167797
+      }
+    ],
+    "network": [],
+    "metadata": {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/[REDACTED-IP] Safari/537.36",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "browser": "Chrome",
+      "os": "Windows",
+      "url": "https://demo.kz.bugspotter.io/buggy-app.html",
+      "timestamp": 1776195167798
+    }
+  },
+  "captured_at": "2026-04-14T19:32:51.620Z"
+}
