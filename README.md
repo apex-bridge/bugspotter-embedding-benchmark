@@ -4,7 +4,7 @@ I benchmarked 6 self-hosted embedding models for duplicate bug report detection.
 
 **Full write-up:** [I Benchmarked 6 Embedding Models for Bug Report Deduplication. Here's What Actually Works.](https://dev.to/bugspotter/embedding-models-bug-dedup)
 
-![F1 vs Latency](results-v2/figures/fig_01_hero_scatter.png)
+![F1 vs Latency](docs/fig_01_hero_scatter.png)
 
 ## Key Findings
 
