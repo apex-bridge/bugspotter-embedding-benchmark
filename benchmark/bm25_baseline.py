@@ -134,6 +134,117 @@ def run_bm25(all_ids, all_texts, id_to_idx, pairs):
     return results
 
 
+def run_bm25f(reports, id_to_idx_map, pairs):
+    """BM25F baseline: field-weighted BM25.
+
+    Scores each field (title, description, console_logs, network_logs)
+    independently with BM25, then combines with learned-style weights.
+    This is what Zhang et al. (2023) found competitive with DL approaches.
+    """
+    print("\n=== BM25F Baseline (field-weighted) ===")
+    try:
+        from rank_bm25 import BM25Okapi
+    except ImportError:
+        print("rank_bm25 not installed. Skipping.")
+        return []
+
+    # Field weights — title and console errors are most discriminative
+    FIELD_WEIGHTS = {
+        "title": 3.0,
+        "description": 1.0,
+        "console": 2.0,
+        "network": 1.5,
+    }
+
+    # Extract fields per report
+    from embed_all import extract_console_errors, extract_failed_requests
+
+    fields = {}  # {report_id: {field_name: text}}
+    for r in reports:
+        rid = r["id"]
+        fields[rid] = {
+            "title": r.get("title", ""),
+            "description": r.get("description", ""),
+            "console": " ".join(extract_console_errors(r.get("console_logs", []))),
+            "network": " ".join(extract_failed_requests(r.get("network_logs", []))),
+        }
+
+    all_ids = sorted(fields.keys())
+    id_to_idx = {rid: i for i, rid in enumerate(all_ids)}
+
+    # Build per-field BM25 indexes
+    t0 = time.perf_counter()
+    bm25_indexes = {}
+    for field_name in FIELD_WEIGHTS:
+        texts = [fields[rid][field_name].lower().split() for rid in all_ids]
+        # Skip empty fields
+        if all(len(t) == 0 for t in texts):
+            continue
+        bm25_indexes[field_name] = BM25Okapi(texts)
+    elapsed = time.perf_counter() - t0
+    print(f"Built {len(bm25_indexes)} field indexes in {elapsed:.2f}s")
+
+    # Compute weighted scores for all pairs
+    print("Computing pairwise field-weighted scores...")
+    t0 = time.perf_counter()
+
+    raw_scores = []
+    pair_info = []
+    for pair in pairs:
+        a_id, b_id = pair["report_a_id"], pair["report_b_id"]
+        if a_id not in id_to_idx or b_id not in id_to_idx:
+            continue
+
+        a_idx = id_to_idx[a_id]
+        b_idx = id_to_idx[b_id]
+
+        weighted_score = 0.0
+        total_weight = 0.0
+
+        for field_name, weight in FIELD_WEIGHTS.items():
+            if field_name not in bm25_indexes:
+                continue
+            bm25 = bm25_indexes[field_name]
+            tokens_a = fields[all_ids[a_idx]][field_name].lower().split()
+            tokens_b = fields[all_ids[b_idx]][field_name].lower().split()
+
+            if not tokens_a or not tokens_b:
+                continue
+
+            # Bidirectional scoring
+            score_ab = bm25.get_scores(tokens_a)[b_idx]
+            score_ba = bm25.get_scores(tokens_b)[a_idx]
+            avg_score = (score_ab + score_ba) / 2.0
+
+            weighted_score += weight * avg_score
+            total_weight += weight
+
+        raw_scores.append(weighted_score / total_weight if total_weight > 0 else 0)
+        pair_info.append(pair)
+
+    elapsed = time.perf_counter() - t0
+    print(f"Computed {len(raw_scores)} scores in {elapsed:.2f}s")
+
+    # Normalize to [0, 1]
+    raw_scores = np.array(raw_scores)
+    min_s, max_s = raw_scores.min(), raw_scores.max()
+    if max_s > min_s:
+        normalized = (raw_scores - min_s) / (max_s - min_s)
+    else:
+        normalized = np.zeros_like(raw_scores)
+
+    results = []
+    for i, pair in enumerate(pair_info):
+        results.append({
+            "pair_id": pair["pair_id"],
+            "model": "bm25f_baseline",
+            "cosine_score": round(float(normalized[i]), 6),
+            "label": pair["label"],
+            "pair_type": pair["pair_type"],
+        })
+    return results
+
+
 def evaluate_baseline(name, results):
     """Run threshold sweep and print results for one baseline."""
     from sweep_threshold import sweep_thresholds
@@ -201,14 +312,15 @@ def main():
     all_texts = [report_texts[rid] for rid in all_ids]
     id_to_idx = {rid: i for i, rid in enumerate(all_ids)}
 
-    # Run both baselines
+    # Run all three baselines
     tfidf_results = run_tfidf(all_ids, all_texts, id_to_idx, pairs)
     bm25_results = run_bm25(all_ids, all_texts, id_to_idx, pairs)
+    bm25f_results = run_bm25f(reports, id_to_idx, pairs)
 
-    all_results = tfidf_results + bm25_results
+    all_results = tfidf_results + bm25_results + bm25f_results
 
     # Append to existing similarity scores (remove old baseline rows first)
-    baseline_models = {"tfidf_baseline", "bm25_baseline"}
+    baseline_models = {"tfidf_baseline", "bm25_baseline", "bm25f_baseline"}
     if os.path.exists(args.output_scores) and os.path.getsize(args.output_scores) > 0:
         with open(args.output_scores, "r", encoding="utf-8") as f:
             existing = [r for r in csv.DictReader(f) if r["model"] not in baseline_models]
@@ -223,12 +335,14 @@ def main():
         writer.writerows(all_rows)
     print(f"\nSaved {len(all_results)} baseline scores to {args.output_scores}")
 
-    # Evaluate both
+    # Evaluate all three
     summaries = []
     if tfidf_results:
         summaries.append(evaluate_baseline("tfidf_baseline", tfidf_results))
     if bm25_results:
         summaries.append(evaluate_baseline("bm25_baseline", bm25_results))
+    if bm25f_results:
+        summaries.append(evaluate_baseline("bm25f_baseline", bm25f_results))
 
     # Save summary
     os.makedirs(os.path.dirname(args.output_summary) or ".", exist_ok=True)
