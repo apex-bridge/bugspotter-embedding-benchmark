@@ -48,6 +48,61 @@ def sweep_thresholds(scores: np.ndarray, labels: np.ndarray,
     return results
 
 
+def cross_validated_threshold(scores, labels, n_folds=5, seed=42):
+    """Pick threshold on train folds, evaluate on held-out fold.
+
+    Returns (cv_f1, cv_threshold, cv_precision, cv_recall) — averaged across folds.
+    This avoids the test-set contamination of sweeping on the full dataset.
+    """
+    rng = np.random.RandomState(seed)
+    indices = np.arange(len(scores))
+    rng.shuffle(indices)
+    folds = np.array_split(indices, n_folds)
+
+    fold_f1s = []
+    fold_thresholds = []
+    fold_precisions = []
+    fold_recalls = []
+
+    for i in range(n_folds):
+        # Train on all folds except i
+        test_idx = folds[i]
+        train_idx = np.concatenate([folds[j] for j in range(n_folds) if j != i])
+
+        train_scores = scores[train_idx]
+        train_labels = labels[train_idx]
+        test_scores = scores[test_idx]
+        test_labels = labels[test_idx]
+
+        # Pick best threshold on train set
+        train_sweep = sweep_thresholds(train_scores, train_labels)
+        best_train = max(train_sweep, key=lambda r: r["f1"])
+        threshold = best_train["threshold"]
+
+        # Evaluate on held-out test set
+        predicted = (test_scores >= threshold).astype(int)
+        tp = int(((predicted == 1) & (test_labels == 1)).sum())
+        fp = int(((predicted == 1) & (test_labels == 0)).sum())
+        fn = int(((predicted == 0) & (test_labels == 1)).sum())
+
+        prec = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+        rec = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+        f1 = 2 * prec * rec / (prec + rec) if (prec + rec) > 0 else 0.0
+
+        fold_f1s.append(f1)
+        fold_thresholds.append(threshold)
+        fold_precisions.append(prec)
+        fold_recalls.append(rec)
+
+    return {
+        "cv_f1_mean": round(np.mean(fold_f1s), 4),
+        "cv_f1_std": round(np.std(fold_f1s), 4),
+        "cv_threshold_mean": round(np.mean(fold_thresholds), 2),
+        "cv_precision_mean": round(np.mean(fold_precisions), 4),
+        "cv_recall_mean": round(np.mean(fold_recalls), 4),
+    }
+
+
 def main():
     parser = argparse.ArgumentParser(description="Threshold sweep")
     parser.add_argument("--input", default="results/raw/similarity_scores.csv")
@@ -104,12 +159,22 @@ def main():
         print(f"  Recall@0.90: {recall_at_90:.3f} "
               f"({'would miss ' + str(int((1-recall_at_90)*labels.sum())) + ' duplicates' if recall_at_90 < 1 else 'perfect'})")
 
+        # Cross-validated threshold selection (avoids train-on-test)
+        cv = cross_validated_threshold(scores, labels)
+        print(f"  CV F1: {cv['cv_f1_mean']:.3f} ± {cv['cv_f1_std']:.3f} "
+              f"(threshold={cv['cv_threshold_mean']}, held-out evaluation)")
+
         summary_rows.append({
             "model": model,
             "best_threshold": best["threshold"],
             "best_f1": best["f1"],
             "best_precision": best["precision"],
             "best_recall": best["recall"],
+            "cv_f1_mean": cv["cv_f1_mean"],
+            "cv_f1_std": cv["cv_f1_std"],
+            "cv_threshold": cv["cv_threshold_mean"],
+            "cv_precision": cv["cv_precision_mean"],
+            "cv_recall": cv["cv_recall_mean"],
             "roc_auc": round(auc, 4),
             "recall_at_0.90": round(recall_at_90, 4),
             "total_pairs": len(scores),
