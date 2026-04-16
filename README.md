@@ -29,7 +29,20 @@ I benchmarked 6 self-hosted embedding models for duplicate bug report detection.
 
 Vector stores: Qdrant, ChromaDB, sqlite-vec tested at 550 records; pgvector included in scale tests up to 100K.
 
-## Quick Start
+## Three Ways to Use This Repo
+
+### 1. Verify the published results (no Docker, 30 seconds)
+
+```bash
+git clone https://github.com/apex-bridge/bugspotter-embedding-benchmark.git
+cd bugspotter-embedding-benchmark
+pip install numpy
+python analysis/aggregate_runs.py
+```
+
+This reads the committed raw data from 3 runs and reproduces the ± values from the article.
+
+### 2. Run locally (Docker + ~5 hours)
 
 **Requirements:** Docker, Python 3.10+, ~16GB RAM (8GB if skipping qwen3)
 
@@ -40,7 +53,8 @@ cd bugspotter-embedding-benchmark
 # Start infrastructure
 docker compose up -d
 
-# Pull embedding models
+# Pull embedding models (wait for Ollama to be healthy first)
+docker compose exec ollama ollama list  # should return empty list
 ./setup.sh
 
 # Python environment
@@ -51,6 +65,16 @@ pip install -r requirements.txt
 # Run the full pipeline (~4-5 hours on 8 vCPU)
 ./benchmark/run_all.sh
 ```
+
+### 3. One-click cloud setup (recommended for full reproduction)
+
+Spin up a Hetzner CPX42 (8 vCPU, 16GB RAM, €25/mo), SSH in as root, and run:
+
+```bash
+bash <(curl -sSL https://raw.githubusercontent.com/apex-bridge/bugspotter-embedding-benchmark/main/deploy/setup.sh)
+```
+
+This installs everything, pulls models, generates the dataset, and runs the full benchmark.
 
 Or run steps individually:
 
