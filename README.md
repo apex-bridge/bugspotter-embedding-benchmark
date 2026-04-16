@@ -8,20 +8,24 @@ I benchmarked 6 self-hosted embedding models for duplicate bug report detection.
 
 ## Key Findings
 
-- **Qwen3 (7.6B) wins — but barely.** F1=0.990 vs mxbai-embed-large (335M) at F1=0.987. The 0.3% gap is real but narrow.
+- **Qwen3 (7.6B) wins — but barely.** F1=0.990 ± 0.000 vs mxbai-embed-large (335M) at F1=0.987 ± 0.000. The 0.3% gap is real (3x noise), confirmed across 3 independent runs.
 - **Threshold 0.9 is a trap.** At cosine ≥ 0.9, recall drops to 22–58%. Optimal thresholds range from 0.65 to 0.74, different for every model.
 - **Machine-captured metadata > human descriptions.** Console errors, network logs, and stack traces improved F1 from 0.951 to 0.990.
+- **TF-IDF can't do this job.** A TF-IDF baseline scored F1=0.658 — embeddings outperform keyword matching by 32+ percentage points.
 
 ## Models Tested
 
+*Mean ± std across 3 independent runs (seeds 42, 123, 456).*
+
 | Model | Params | Dims | F1 | Latency |
 |-------|--------|------|----|---------|
-| qwen3-embedding | 7.6B | 4096 | 0.990 | 2,662ms |
-| bge-m3 | 568M | 1024 | 0.989 | 268ms |
-| mxbai-embed-large | 335M | 1024 | 0.987 | 224ms |
-| nomic-embed-text | 137M | 768 | 0.981 | 82ms |
-| snowflake-arctic-embed | 334M | 768 | 0.979 | 220ms |
-| all-minilm | 22M | 384 | 0.979 | 28ms |
+| qwen3-embedding | 7.6B | 4096 | 0.990 ± 0.000 | 2,662ms |
+| bge-m3 | 568M | 1024 | 0.989 ± 0.000 | 268ms |
+| mxbai-embed-large | 335M | 1024 | 0.987 ± 0.000 | 224ms |
+| nomic-embed-text | 137M | 768 | 0.981 ± 0.000 | 82ms |
+| snowflake-arctic-embed | 334M | 768 | 0.980 ± 0.001 | 220ms |
+| all-minilm | 22M | 384 | 0.979 ± 0.000 | 28ms |
+| *TF-IDF baseline* | — | — | *0.658 ± 0.001* | *<1ms* |
 
 Vector stores: Qdrant, ChromaDB, sqlite-vec tested at 550 records; pgvector included in scale tests up to 100K.
 
