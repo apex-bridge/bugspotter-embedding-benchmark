@@ -2,29 +2,29 @@
 
 I benchmarked 6 self-hosted embedding models for duplicate bug report detection. 650 bug reports (including 250 real SDK captures via Playwright), 4,475 labeled pairs. All models run locally via [Ollama](https://ollama.com/) on a single CPU server (€25/mo). No data leaves your network.
 
-**Full write-up:** [I Benchmarked 6 Embedding Models for Bug Report Deduplication. Here's What Actually Works.](https://dev.to/bugspotter/embedding-models-bug-dedup)
+**Full write-up:** [How I Chose an Embedding Model for Bug Report Deduplication](https://dev.to/bugspotter/embedding-models-bug-dedup)
 
 ![F1 vs Latency](docs/fig_01_hero_scatter.png)
 
 ## Key Findings
 
-- **Qwen3 (7.6B) wins — but barely.** F1=0.990 ± 0.000 vs mxbai-embed-large (335M) at F1=0.987 ± 0.000. Rankings are consistent across 3 runs with different seeds.
+- **Qwen3 (7.6B) wins — but barely.** CV F1=0.990 vs mxbai-embed-large (335M) at 0.985. Rankings are consistent under 5-fold cross-validation.
 - **Threshold 0.9 is a trap.** At cosine ≥ 0.9, recall drops to 22–58%. Optimal thresholds range from 0.65 to 0.74, different for every model. Note: thresholds were tuned on the evaluation set — use them as starting points, not production values.
 - **Machine-captured metadata > human descriptions.** Console errors, network logs, and stack traces improved F1 from 0.951 to 0.990.
 - **Keyword matching falls short.** TF-IDF (F1=0.774), BM25F (0.499), BM25 (0.388) — embeddings outperform the best lexical method by ~21 points. Baselines use simple whitespace tokenization; a tuned Lucene-style BM25F could narrow this gap.
 
 ## Models Tested
 
-*Mean ± std across 3 independent runs (seeds 42, 123, 456).*
+*CV F1 = 5-fold cross-validated (threshold picked on train folds, evaluated on held-out fold).*
 
-| Model | Params | Dims | F1 | Latency |
-|-------|--------|------|----|---------|
-| qwen3-embedding | 7.6B | 4096 | 0.990 ± 0.000 | 2,662ms |
-| bge-m3 | 568M | 1024 | 0.989 ± 0.000 | 268ms |
-| mxbai-embed-large | 335M | 1024 | 0.987 ± 0.000 | 224ms |
-| nomic-embed-text | 137M | 768 | 0.981 ± 0.000 | 82ms |
-| snowflake-arctic-embed | 334M | 768 | 0.980 ± 0.001 | 220ms |
-| all-minilm | 22M | 384 | 0.979 ± 0.000 | 28ms |
+| Model | Params | Dims | CV F1 | Latency |
+|-------|--------|------|-------|---------|
+| qwen3-embedding | 7.6B | 4096 | 0.990 | 2,662ms |
+| bge-m3 | 568M | 1024 | 0.988 | 268ms |
+| mxbai-embed-large | 335M | 1024 | 0.985 | 224ms |
+| nomic-embed-text | 137M | 768 | 0.980 | 82ms |
+| snowflake-arctic-embed | 334M | 768 | 0.979 | 220ms |
+| all-minilm | 22M | 384 | 0.978 | 28ms |
 | *TF-IDF baseline* | — | — | *0.774* | *<1ms* |
 | *BM25F baseline* | — | — | *0.499* | *<1ms* |
 | *BM25 baseline* | — | — | *0.388* | *<1ms* |
