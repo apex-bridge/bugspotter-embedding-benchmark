@@ -9,8 +9,13 @@ data/github_issues.json
 data/bugzilla_bugs.json
 
 # Results (regenerate with benchmark/ scripts)
-results/
+results/raw/
+results/figures/
 results-*/
+
+# Keep committed run data and aggregated results
+!results/runs/
+!results/aggregated/
 
 # Vector store data
 .chroma/

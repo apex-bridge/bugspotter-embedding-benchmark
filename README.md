@@ -157,10 +157,40 @@ Fields joined with `|`: title, description, console errors (up to 5), failed net
 
 Tested on Hetzner CPX42: 8 vCPU (AMD EPYC), 16GB RAM, 320GB NVMe, Ubuntu 24.04. Total cost: ~€0.20 for a full run.
 
+## Reproducing the ± values
+
+The article reports mean ± std across 3 independent runs on separate Hetzner CPX42 VMs. The committed `results/runs/` directory contains the actual outputs — you can verify the ± values without re-running:
+
+```bash
+python analysis/aggregate_runs.py
+```
+
+To reproduce from scratch:
+
+```bash
+# Option A: 3 separate VMs (~5h each, in parallel, €0.60 total)
+# VM 1: bash deploy/run_clean.sh --seed 42
+# VM 2: bash deploy/run_clean.sh --seed 123
+# VM 3: bash deploy/run_clean.sh --seed 456
+# Then download each VM's results/raw/ into results/runs/seed_<SEED>/
+
+# Option B: Single machine (~15h sequential)
+bash deploy/run_all_seeds.sh
+```
+
+### What the seed controls
+
+The `--seed` flag affects synthetic data generation only:
+- Which paraphrases receive typo injection
+- Which D3/D4 pairs are sampled
+- The order of pairs in the ground truth CSV
+
+It does NOT affect Ollama embedding inference — Ollama at fixed version (v0.6.2) produces deterministic embeddings at batch size 1. The near-zero std values reflect stability of embedding-based dedup across dataset variations, not inference non-determinism.
+
 ## Notes
 
-- **Ollama version:** We used Ollama v0.6.2. Ollama has had embedding consistency issues across versions ([#3777](https://github.com/ollama/ollama/issues/3777), [#4207](https://github.com/ollama/ollama/issues/4207)). Pin the version in production.
-- **Python:** Tested with Python 3.12 on Ubuntu 24.04.
+- **Ollama version:** v0.6.2. Ollama has had embedding consistency issues across versions ([#3777](https://github.com/ollama/ollama/issues/3777), [#4207](https://github.com/ollama/ollama/issues/4207)). Pin the version in production.
+- **Python:** 3.12 on Ubuntu 24.04.
 - **PostgreSQL password:** Defaults to `bench`. Override with `POSTGRES_PASSWORD` env var.
 
 ## License

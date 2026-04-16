@@ -1,0 +1,2 @@
+model,best_threshold,best_f1,best_precision,best_recall,roc_auc,recall_at_0.90,total_pairs,total_duplicates
+tfidf_baseline,0.5,0.6596,1.0,0.4921,0.9954,0.0,4475,2475

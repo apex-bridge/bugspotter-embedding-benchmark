@@ -1,0 +1,7 @@
+model,best_threshold,best_f1,best_precision,best_recall,roc_auc,recall_at_0.90,total_pairs,total_duplicates
+all-minilm_latest,0.63,0.9785,0.9799,0.977,0.9978,0.368,4415,2440
+bge-m3_latest,0.69,0.9897,0.9864,0.9931,0.9989,0.2865,4475,2475
+mxbai-embed-large_latest,0.72,0.9868,0.9793,0.9943,0.9988,0.4735,4475,2475
+nomic-embed-text_latest,0.73,0.9816,0.9799,0.9834,0.9971,0.3576,4475,2475
+qwen3-embedding_latest,0.74,0.9899,0.9868,0.9931,0.9991,0.5737,4475,2475
+snowflake-arctic-embed_latest,0.65,0.98,0.9786,0.9814,0.9979,0.221,4475,2475
