@@ -1,2 +1,4 @@
 model,best_threshold,best_f1,best_precision,best_recall,roc_auc,recall_at_0.90,total_pairs,total_duplicates
-tfidf_baseline,0.5,0.6571,1.0,0.4893,0.9955,0.0,4475,2475
+tfidf_baseline,0.5,0.774,0.9994,0.6315,0.9955,0.0008,4475,2475
+bm25_baseline,0.5,0.3879,0.9967,0.2408,0.9816,0.0008,4475,2475
+bm25f_baseline,0.5,0.4992,0.994,0.3333,0.9689,0.0069,4475,2475
