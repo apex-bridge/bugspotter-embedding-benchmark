@@ -11,13 +11,22 @@
 #   2. apt-get update && apt-get install -y git
 #   3. git clone https://github.com/apex-bridge/bugspotter-embedding-benchmark.git /opt/benchmark
 #   4. screen -S bench
-#   5. bash /opt/benchmark/deploy/run_clean.sh
+#   5. bash /opt/benchmark/deploy/run_clean.sh [--seed 42]
 #   6. Ctrl+A D to detach
 #
 # DO NOT run via curl | bash — it breaks docker exec and screen.
 # =============================================================================
 
 set -euo pipefail
+
+# Parse --seed argument (default: 42)
+SEED=42
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --seed) SEED="$2"; shift 2 ;;
+        *) shift ;;
+    esac
+done
 
 LOG="/root/benchmark_clean.log"
 PROGRESS="/root/benchmark_progress.txt"
@@ -125,7 +134,7 @@ echo "Python: $(python --version)"
 echo ""
 step "6/13 Generate dataset"
 echo "=== 6/13. Generate dataset ==="
-python data/generate_synthetic.py
+python data/generate_synthetic.py --seed $SEED
 python data/generate_pairs.py
 
 echo ""
@@ -163,6 +172,16 @@ python benchmark/sweep_threshold.py
 echo ""
 echo "--- E1 Results ---"
 cat results/raw/model_summary.csv
+
+# ===== 7c. BM25/TF-IDF BASELINE =====
+echo ""
+step "7c/13 BM25 baseline"
+echo "=== 7c. BM25/TF-IDF baseline ==="
+python benchmark/bm25_baseline.py
+
+echo ""
+echo "--- BM25 Results ---"
+cat results/raw/bm25_summary.csv
 
 # ===== 8. E3: MRL TRUNCATION =====
 echo ""

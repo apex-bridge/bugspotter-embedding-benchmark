@@ -1,6 +1,6 @@
 #!/bin/bash
 # Run the complete benchmark pipeline.
-# Usage: ./benchmark/run_all.sh
+# Usage: ./benchmark/run_all.sh [--seed 42]
 #
 # Prerequisites:
 #   - Docker services running (ollama, postgres, qdrant)
@@ -13,6 +13,16 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 cd "$PROJECT_DIR"
 
+# Parse --seed argument (default: 42)
+SEED=42
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --seed) SEED="$2"; shift 2 ;;
+        *) shift ;;
+    esac
+done
+echo "Random seed: $SEED"
+
 echo "============================================"
 echo " BugSpotter Embedding Benchmark Pipeline"
 echo "============================================"
@@ -20,7 +30,7 @@ echo "============================================"
 # Step 1: Generate dataset
 echo ""
 echo "=== Step 1: Generate synthetic bug reports ==="
-python data/generate_synthetic.py --output data/bug_reports.json --github-input data/github_issues.json
+python data/generate_synthetic.py --output data/bug_reports.json --github-input data/github_issues.json --seed $SEED
 
 echo ""
 echo "=== Step 1b: Generate ground truth pairs ==="
@@ -63,6 +73,11 @@ python benchmark/sweep_threshold.py \
     --input results/raw/similarity_scores.csv \
     --output-sweep results/raw/threshold_sweep.csv \
     --output-summary results/raw/model_summary.csv
+
+# Step 5b: BM25/TF-IDF baseline
+echo ""
+echo "=== Step 5b: BM25/TF-IDF baseline ==="
+python benchmark/bm25_baseline.py
 
 # Step 6: MRL truncation experiment
 echo ""
