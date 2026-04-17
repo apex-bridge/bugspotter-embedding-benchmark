@@ -8,7 +8,7 @@ I benchmarked 6 self-hosted embedding models for duplicate bug report detection.
 
 ## Key Findings
 
-- **Qwen3 (7.6B) wins — but barely.** CV F1=0.990 vs mxbai-embed-large (335M) at 0.985. Rankings are consistent under 5-fold cross-validation.
+- **The top 3 models are statistically tied.** qwen3 (CV F1=0.990), bge-m3 (0.988), and mxbai (0.985) have overlapping bootstrap 95% CIs — you can't pick a winner from F1 alone. Pick on latency, hard-negative errors, and pgvector compatibility.
 - **Threshold 0.9 is a trap.** At cosine ≥ 0.9, recall drops to 22–58%. Optimal thresholds range from 0.65 to 0.74, different for every model. Note: thresholds were tuned on the evaluation set — use them as starting points, not production values.
 - **Machine-captured metadata > human descriptions.** Console errors, network logs, and stack traces improved F1 from 0.951 to 0.990.
 - **Keyword matching falls short.** TF-IDF (F1=0.774), BM25F (0.499), BM25 (0.388) — embeddings outperform the best lexical method by ~21 points. Baselines use simple whitespace tokenization; a tuned Lucene-style BM25F could narrow this gap.

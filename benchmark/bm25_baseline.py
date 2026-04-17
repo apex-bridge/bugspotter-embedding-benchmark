@@ -246,27 +246,24 @@ def run_bm25f(reports, id_to_idx_map, pairs):
 
 
 def code_aware_tokenize(text):
-    """Tokenize with code-awareness: split camelCase, snake_case, preserve error types."""
+    """Lucene-style code-aware tokenizer.
+
+    - Splits camelCase: "TypeError" -> ["type", "error"]
+    - Splits snake_case: "stack_trace" -> ["stack", "trace"]
+    - Lowercases but NO stemming (Porter stemmer destroys code tokens
+      like "undefined" -> "undefin", "CORS" -> "cor")
+    - No stopword removal (small words matter in error messages)
+    """
     import re
-    from nltk.stem import PorterStemmer
-    from nltk.corpus import stopwords
 
-    stemmer = PorterStemmer()
-    stops = set(stopwords.words("english"))
-
-    # Split camelCase: "TypeError" -> "type error", "processPayment" -> "process payment"
-    text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)
+    # Split camelCase: "TypeError" -> "Type Error", "processPayment" -> "process Payment"
+    split_camel = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)
     # Split snake_case: "stack_trace" -> "stack trace"
-    text = text.replace('_', ' ')
-    # Keep HTTP status codes as tokens: "404", "500"
-    # Keep error types: "TypeError", "RangeError" (already split by camelCase)
-    # Lowercase
-    text = text.lower()
-    # Split on non-alphanumeric (preserves numbers)
-    tokens = re.findall(r'[a-z0-9]+', text)
-    # Remove stopwords, apply stemming
-    tokens = [stemmer.stem(t) for t in tokens if t not in stops and len(t) > 1]
-    return tokens
+    split_snake = split_camel.replace('_', ' ')
+    # Lowercase and extract alphanumeric tokens
+    tokens = re.findall(r'[a-z0-9]+', split_snake.lower())
+    # Keep tokens of 2+ chars
+    return [t for t in tokens if len(t) > 1]
 
 
 def run_bm25f_tuned(reports, id_to_idx_map, pairs):
@@ -375,7 +372,7 @@ def run_bm25f_tuned(reports, id_to_idx_map, pairs):
         else:
             norm = np.zeros_like(weighted)
 
-        sweep = sweep_thresholds(norm, labels)
+        sweep = sweep_thresholds(norm, labels, start=0.0, stop=1.0, step=0.01)
         f1 = max(r["f1"] for r in sweep)
         if f1 > best_f1:
             best_f1 = f1
@@ -416,7 +413,8 @@ def evaluate_baseline(name, results):
     scores_arr = np.array([r["cosine_score"] for r in results])
     labels_arr = np.array([1 if r["label"] == "duplicate" else 0 for r in results])
 
-    sweep = sweep_thresholds(scores_arr, labels_arr)
+    # Sweep from 0 for baselines (scores may cluster below 0.5 after normalization)
+    sweep = sweep_thresholds(scores_arr, labels_arr, start=0.0, stop=1.0, step=0.01)
     best = max(sweep, key=lambda r: r["f1"])
     auc = roc_auc_score(labels_arr, scores_arr)
 
