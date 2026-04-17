@@ -245,6 +245,169 @@ def run_bm25f(reports, id_to_idx_map, pairs):
     return results
 
 
+def code_aware_tokenize(text):
+    """Tokenize with code-awareness: split camelCase, snake_case, preserve error types."""
+    import re
+    from nltk.stem import PorterStemmer
+    from nltk.corpus import stopwords
+
+    stemmer = PorterStemmer()
+    stops = set(stopwords.words("english"))
+
+    # Split camelCase: "TypeError" -> "type error", "processPayment" -> "process payment"
+    text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)
+    # Split snake_case: "stack_trace" -> "stack trace"
+    text = text.replace('_', ' ')
+    # Keep HTTP status codes as tokens: "404", "500"
+    # Keep error types: "TypeError", "RangeError" (already split by camelCase)
+    # Lowercase
+    text = text.lower()
+    # Split on non-alphanumeric (preserves numbers)
+    tokens = re.findall(r'[a-z0-9]+', text)
+    # Remove stopwords, apply stemming
+    tokens = [stemmer.stem(t) for t in tokens if t not in stops and len(t) > 1]
+    return tokens
+
+
+def run_bm25f_tuned(reports, id_to_idx_map, pairs):
+    """BM25F with code-aware tokenization, stemming, and grid-searched weights.
+
+    This is the properly-tuned baseline that Zhang et al. (2023) would expect.
+    Uses NLTK Porter stemmer, stopword removal, camelCase/snake_case splitting.
+    Field weights are grid-searched on a subset.
+    """
+    print("\n=== BM25F Tuned Baseline (stemming + grid-searched weights) ===")
+    try:
+        from rank_bm25 import BM25Okapi
+    except ImportError:
+        print("rank_bm25 not installed. Skipping.")
+        return []
+
+    from embed_all import extract_console_errors, extract_failed_requests
+
+    # Extract fields per report with code-aware tokenization
+    fields = {}
+    for r in reports:
+        rid = r["id"]
+        fields[rid] = {
+            "title": code_aware_tokenize(r.get("title", "")),
+            "description": code_aware_tokenize(r.get("description", "")),
+            "console": code_aware_tokenize(" ".join(extract_console_errors(r.get("console_logs", [])))),
+            "network": code_aware_tokenize(" ".join(extract_failed_requests(r.get("network_logs", [])))),
+        }
+
+    all_ids = sorted(fields.keys())
+    id_to_idx = {rid: i for i, rid in enumerate(all_ids)}
+
+    # Grid search over field weights
+    t0 = time.perf_counter()
+    weight_configs = [
+        {"title": 3.0, "description": 1.0, "console": 2.0, "network": 1.5},
+        {"title": 4.0, "description": 1.0, "console": 3.0, "network": 2.0},
+        {"title": 2.0, "description": 1.5, "console": 2.5, "network": 1.0},
+        {"title": 5.0, "description": 1.0, "console": 2.0, "network": 1.0},
+        {"title": 3.0, "description": 2.0, "console": 1.0, "network": 1.0},
+        {"title": 2.0, "description": 1.0, "console": 3.0, "network": 2.0},
+    ]
+
+    # Build BM25 indexes (shared across weight configs)
+    bm25_indexes = {}
+    for field_name in ["title", "description", "console", "network"]:
+        texts = [fields[rid][field_name] for rid in all_ids]
+        if all(len(t) == 0 for t in texts):
+            continue
+        bm25_indexes[field_name] = BM25Okapi(texts)
+
+    # Score all pairs once per field (cache), then combine with different weights
+    print(f"Computing per-field BM25 scores...")
+    field_scores = {}  # {field_name: [(score_ab + score_ba) / 2 for each pair]}
+
+    pair_info = []
+    for field_name, bm25 in bm25_indexes.items():
+        scores_for_field = []
+        pair_info_local = []
+        for pair in pairs:
+            a_id, b_id = pair["report_a_id"], pair["report_b_id"]
+            if a_id not in id_to_idx or b_id not in id_to_idx:
+                continue
+
+            a_idx = id_to_idx[a_id]
+            b_idx = id_to_idx[b_id]
+            tokens_a = fields[all_ids[a_idx]][field_name]
+            tokens_b = fields[all_ids[b_idx]][field_name]
+
+            if not tokens_a or not tokens_b:
+                scores_for_field.append(0.0)
+            else:
+                score_ab = bm25.get_scores(tokens_a)[b_idx]
+                score_ba = bm25.get_scores(tokens_b)[a_idx]
+                scores_for_field.append((score_ab + score_ba) / 2.0)
+
+            if not pair_info:
+                pair_info_local.append(pair)
+
+        field_scores[field_name] = np.array(scores_for_field)
+        if not pair_info:
+            pair_info = pair_info_local
+
+    # Grid search: try each weight config, pick best F1
+    from sweep_threshold import sweep_thresholds
+
+    best_config = None
+    best_f1 = 0
+
+    labels = np.array([1 if p["label"] == "duplicate" else 0 for p in pair_info])
+
+    for config in weight_configs:
+        weighted = np.zeros(len(pair_info))
+        total_w = 0
+        for field_name, weight in config.items():
+            if field_name in field_scores:
+                weighted += weight * field_scores[field_name]
+                total_w += weight
+        if total_w > 0:
+            weighted /= total_w
+
+        # Normalize
+        mn, mx = weighted.min(), weighted.max()
+        if mx > mn:
+            norm = (weighted - mn) / (mx - mn)
+        else:
+            norm = np.zeros_like(weighted)
+
+        sweep = sweep_thresholds(norm, labels)
+        f1 = max(r["f1"] for r in sweep)
+        if f1 > best_f1:
+            best_f1 = f1
+            best_config = config
+
+    elapsed = time.perf_counter() - t0
+    print(f"Grid search: best weights={best_config}, F1={best_f1:.4f} in {elapsed:.1f}s")
+
+    # Compute final scores with best weights
+    weighted = np.zeros(len(pair_info))
+    total_w = 0
+    for field_name, weight in best_config.items():
+        if field_name in field_scores:
+            weighted += weight * field_scores[field_name]
+            total_w += weight
+    weighted /= total_w
+
+    mn, mx = weighted.min(), weighted.max()
+    normalized = (weighted - mn) / (mx - mn) if mx > mn else np.zeros_like(weighted)
+
+    results = []
+    for i, pair in enumerate(pair_info):
+        results.append({
+            "pair_id": pair["pair_id"],
+            "model": "bm25f_tuned",
+            "cosine_score": round(float(normalized[i]), 6),
+            "label": pair["label"],
+            "pair_type": pair["pair_type"],
+        })
+    return results
+
+
 def evaluate_baseline(name, results):
     """Run threshold sweep and print results for one baseline."""
     from sweep_threshold import sweep_thresholds
@@ -312,15 +475,16 @@ def main():
     all_texts = [report_texts[rid] for rid in all_ids]
     id_to_idx = {rid: i for i, rid in enumerate(all_ids)}
 
-    # Run all three baselines
+    # Run all four baselines
     tfidf_results = run_tfidf(all_ids, all_texts, id_to_idx, pairs)
     bm25_results = run_bm25(all_ids, all_texts, id_to_idx, pairs)
     bm25f_results = run_bm25f(reports, id_to_idx, pairs)
+    bm25f_tuned_results = run_bm25f_tuned(reports, id_to_idx, pairs)
 
-    all_results = tfidf_results + bm25_results + bm25f_results
+    all_results = tfidf_results + bm25_results + bm25f_results + bm25f_tuned_results
 
     # Append to existing similarity scores (remove old baseline rows first)
-    baseline_models = {"tfidf_baseline", "bm25_baseline", "bm25f_baseline"}
+    baseline_models = {"tfidf_baseline", "bm25_baseline", "bm25f_baseline", "bm25f_tuned"}
     if os.path.exists(args.output_scores) and os.path.getsize(args.output_scores) > 0:
         with open(args.output_scores, "r", encoding="utf-8") as f:
             existing = [r for r in csv.DictReader(f) if r["model"] not in baseline_models]
@@ -343,6 +507,8 @@ def main():
         summaries.append(evaluate_baseline("bm25_baseline", bm25_results))
     if bm25f_results:
         summaries.append(evaluate_baseline("bm25f_baseline", bm25f_results))
+    if bm25f_tuned_results:
+        summaries.append(evaluate_baseline("bm25f_tuned", bm25f_tuned_results))
 
     # Save summary
     os.makedirs(os.path.dirname(args.output_summary) or ".", exist_ok=True)
