@@ -17,8 +17,15 @@ fi
 echo "=== 3. Infrastructure start (Ollama, pgvector, Qdrant) ==="
 sudo docker compose up -d
 
-echo "Wait for Ollama initialization (15 sec)..."
-sleep 15
+echo "Waiting for Ollama to be ready..."
+for i in $(seq 1 30); do
+  if curl -sf http://localhost:11434/api/tags > /dev/null 2>&1; then
+    echo "Ollama is ready."
+    break
+  fi
+  echo "  Waiting... ($i/30)"
+  sleep 5
+done
 
 echo "=== 4. Loading Embedding-models in Ollama ==="
 MODELS=(
