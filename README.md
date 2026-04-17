@@ -211,11 +211,11 @@ The `--seed` flag affects synthetic data generation only:
 - Which D3/D4 pairs are sampled
 - The order of pairs in the ground truth CSV
 
-It does NOT affect Ollama embedding inference — Ollama at fixed version (v0.6.2) produces deterministic embeddings at batch size 1. The near-zero std values reflect stability of embedding-based dedup across dataset variations, not inference non-determinism.
+It does NOT affect Ollama embedding inference — Ollama at fixed version (v0.20.7) produces deterministic embeddings at batch size 1. The near-zero std values reflect stability of embedding-based dedup across dataset variations, not inference non-determinism.
 
 ## Notes
 
-- **Ollama version:** v0.6.2. Ollama has had embedding consistency issues across versions ([#3777](https://github.com/ollama/ollama/issues/3777), [#4207](https://github.com/ollama/ollama/issues/4207)). Pin the version in production.
+- **Ollama version:** v0.20.7. Ollama has had embedding consistency issues across versions ([#3777](https://github.com/ollama/ollama/issues/3777), [#4207](https://github.com/ollama/ollama/issues/4207)). Pin the version in production.
 - **Python:** 3.12 on Ubuntu 24.04.
 - **PostgreSQL password:** Defaults to `bench`. Override with `POSTGRES_PASSWORD` env var.
 
