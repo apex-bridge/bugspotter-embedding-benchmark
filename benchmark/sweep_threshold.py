@@ -48,6 +48,85 @@ def sweep_thresholds(scores: np.ndarray, labels: np.ndarray,
     return results
 
 
+def archetype_cv_threshold(model_scores, pairs_path="data/pairs_ground_truth.csv",
+                           reports_path="data/bug_reports.json", n_folds=5, seed=42):
+    """Archetype-level CV: hold out entire archetype groups, not random pairs.
+
+    This tests whether the threshold generalizes to unseen bug types,
+    not just unseen pairs of the same bugs. Much harder test.
+    """
+    import json
+    import csv
+
+    # Load group info
+    with open(reports_path, encoding="utf-8") as f:
+        report_groups = {r["id"]: r.get("group", "") for r in json.load(f)}
+
+    with open(pairs_path, encoding="utf-8") as f:
+        pair_info = {p["pair_id"]: p for p in csv.DictReader(f)}
+
+    # Get unique positive-pair groups (those with >1 member)
+    from collections import Counter
+    group_counts = Counter(report_groups.values())
+    positive_groups = sorted(g for g, c in group_counts.items() if c > 1)
+
+    rng = np.random.RandomState(seed)
+    rng.shuffle(positive_groups)
+    folds = np.array_split(positive_groups, n_folds)
+
+    fold_f1s = []
+    fold_thresholds = []
+
+    for i in range(n_folds):
+        test_groups = set(folds[i])
+        train_groups = set(g for j in range(n_folds) if j != i for g in folds[j])
+
+        # Split pairs: a pair belongs to the fold of its group
+        train_idx, test_idx = [], []
+        for idx, s in enumerate(model_scores):
+            pair = pair_info.get(s["pair_id"], {})
+            a_group = report_groups.get(pair.get("report_a_id", ""), "")
+            b_group = report_groups.get(pair.get("report_b_id", ""), "")
+
+            # If either report's group is in test set, the pair goes to test
+            if a_group in test_groups or b_group in test_groups:
+                test_idx.append(idx)
+            else:
+                train_idx.append(idx)
+
+        if not train_idx or not test_idx:
+            continue
+
+        train_scores = np.array([float(model_scores[j]["cosine_score"]) for j in train_idx])
+        train_labels = np.array([1 if model_scores[j]["label"] == "duplicate" else 0 for j in train_idx])
+        test_scores = np.array([float(model_scores[j]["cosine_score"]) for j in test_idx])
+        test_labels = np.array([1 if model_scores[j]["label"] == "duplicate" else 0 for j in test_idx])
+
+        # Pick threshold on train
+        train_sweep = sweep_thresholds(train_scores, train_labels)
+        best_train = max(train_sweep, key=lambda r: r["f1"])
+        threshold = best_train["threshold"]
+
+        # Evaluate on test
+        pred = (test_scores >= threshold).astype(int)
+        tp = int(((pred == 1) & (test_labels == 1)).sum())
+        fp = int(((pred == 1) & (test_labels == 0)).sum())
+        fn = int(((pred == 0) & (test_labels == 1)).sum())
+        prec = tp / (tp + fp) if (tp + fp) > 0 else 0
+        rec = tp / (tp + fn) if (tp + fn) > 0 else 0
+        f1 = 2 * prec * rec / (prec + rec) if (prec + rec) > 0 else 0
+
+        fold_f1s.append(f1)
+        fold_thresholds.append(threshold)
+
+    return {
+        "arch_cv_f1_mean": round(np.mean(fold_f1s), 4) if fold_f1s else 0,
+        "arch_cv_f1_std": round(np.std(fold_f1s), 4) if fold_f1s else 0,
+        "arch_cv_threshold_mean": round(np.mean(fold_thresholds), 2) if fold_thresholds else 0,
+        "n_folds_used": len(fold_f1s),
+    }
+
+
 def cross_validated_threshold(scores, labels, n_folds=5, seed=42):
     """Pick threshold on train folds, evaluate on held-out fold.
 
@@ -161,8 +240,14 @@ def main():
 
         # Cross-validated threshold selection (avoids train-on-test)
         cv = cross_validated_threshold(scores, labels)
-        print(f"  CV F1: {cv['cv_f1_mean']:.3f} ± {cv['cv_f1_std']:.3f} "
-              f"(threshold={cv['cv_threshold_mean']}, held-out evaluation)")
+        print(f"  Pair-level CV F1: {cv['cv_f1_mean']:.3f} ± {cv['cv_f1_std']:.3f} "
+              f"(threshold={cv['cv_threshold_mean']})")
+
+        # Archetype-level CV (holds out entire bug types — harder test)
+        model_scores = [row for row in all_scores if row["model"] == model]
+        arch_cv = archetype_cv_threshold(model_scores)
+        print(f"  Archetype CV F1: {arch_cv['arch_cv_f1_mean']:.3f} ± {arch_cv['arch_cv_f1_std']:.3f} "
+              f"(threshold={arch_cv['arch_cv_threshold_mean']}, {arch_cv['n_folds_used']} folds)")
 
         summary_rows.append({
             "model": model,
@@ -175,6 +260,9 @@ def main():
             "cv_threshold": cv["cv_threshold_mean"],
             "cv_precision": cv["cv_precision_mean"],
             "cv_recall": cv["cv_recall_mean"],
+            "arch_cv_f1_mean": arch_cv["arch_cv_f1_mean"],
+            "arch_cv_f1_std": arch_cv["arch_cv_f1_std"],
+            "arch_cv_threshold": arch_cv["arch_cv_threshold_mean"],
             "roc_auc": round(auc, 4),
             "recall_at_0.90": round(recall_at_90, 4),
             "total_pairs": len(scores),
