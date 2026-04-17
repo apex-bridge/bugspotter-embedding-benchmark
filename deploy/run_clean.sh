@@ -223,6 +223,19 @@ step "10/13 E5: Hard negatives"
 echo "=== 10/13. E5: Hard negatives deep dive ==="
 python analysis/e5_hard_negatives.py
 
+# ===== 10b. BUGZILLA CROSS-VALIDATION (independent test set) =====
+echo ""
+step "10b/13 Bugzilla cross-validation"
+echo "=== 10b. Bugzilla cross-validation (all 6 models on independent data) ==="
+if [ -f "data/bugzilla_bugs.json" ]; then
+    python benchmark/bugzilla_validation.py
+    echo ""
+    echo "--- Bugzilla Results ---"
+    cat results/raw/bugzilla_summary.csv
+else
+    echo "    WARNING: Bugzilla data missing, skipping validation"
+fi
+
 # ===== 11. E7: VECTOR STORE BENCHMARK (real data) =====
 echo ""
 step "11/13 E7: Vector store bench"
