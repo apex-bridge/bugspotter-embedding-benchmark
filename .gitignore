@@ -6,7 +6,8 @@ __pycache__/
 
 # Scraped data (regenerate with data/scrape_*.py)
 data/github_issues.json
-data/bugzilla_bugs.json
+# bugzilla_bugs.json is committed — keeps the 407-bug cross-validation
+# set deterministic across reruns (Bugzilla API can rate-limit / change).
 
 # Results (regenerate with benchmark/ scripts)
 results/raw/
