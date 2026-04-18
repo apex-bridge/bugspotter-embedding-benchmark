@@ -8,10 +8,10 @@ I benchmarked 6 self-hosted embedding models for duplicate bug report detection.
 
 ## Key Findings
 
-- **The top 3 models are statistically tied.** qwen3 (CV F1=0.990), bge-m3 (0.988), and mxbai (0.985) have overlapping bootstrap 95% CIs — you can't pick a winner from F1 alone. Pick on latency, hard-negative errors, and pgvector compatibility.
+- **The top 3 models are statistically tied.** qwen3 (CV F1=0.990), bge-m3 (0.989), and mxbai (0.987) have overlapping bootstrap 95% CIs — you can't pick a winner from F1 alone. Pick on latency, hard-negative errors, and pgvector compatibility.
 - **Threshold 0.9 is a trap.** At cosine ≥ 0.9, recall drops to 22–58%. Optimal thresholds range from 0.65 to 0.74, different for every model. Note: thresholds were tuned on the evaluation set — use them as starting points, not production values.
 - **Machine-captured metadata > human descriptions.** Console errors, network logs, and stack traces improved F1 from 0.951 to 0.990.
-- **Keyword matching falls short.** TF-IDF (F1=0.774), BM25F (0.499), BM25 (0.388) — embeddings outperform the best lexical method by ~21 points. Baselines use simple whitespace tokenization; a tuned Lucene-style BM25F could narrow this gap.
+- **Well-tuned BM25 is closer than folklore suggests.** On this synthetic benchmark, TF-IDF hits F1=0.969 and BM25 hits 0.965 — embeddings lead by only ~2 points. On Mozilla Bugzilla (real multi-author duplicates) the gap widens again, and the *ranking between embedding models shuffles* — bge-m3 drops from #2 to #4, all-minilm climbs from #6 to #3. Don't pick on a single dataset.
 
 ## Models Tested
 
@@ -20,14 +20,15 @@ I benchmarked 6 self-hosted embedding models for duplicate bug report detection.
 | Model | Params | Dims | CV F1 | Latency |
 |-------|--------|------|-------|---------|
 | qwen3-embedding | 7.6B | 4096 | 0.990 | 2,662ms |
-| bge-m3 | 568M | 1024 | 0.988 | 268ms |
-| mxbai-embed-large | 335M | 1024 | 0.985 | 224ms |
+| bge-m3 | 568M | 1024 | 0.989 | 268ms |
+| mxbai-embed-large | 335M | 1024 | 0.987 | 224ms |
 | nomic-embed-text | 137M | 768 | 0.980 | 82ms |
 | snowflake-arctic-embed | 334M | 768 | 0.979 | 220ms |
 | all-minilm | 22M | 384 | 0.978 | 28ms |
-| *TF-IDF baseline* | — | — | *0.774* | *<1ms* |
-| *BM25F baseline* | — | — | *0.499* | *<1ms* |
-| *BM25 baseline* | — | — | *0.388* | *<1ms* |
+| *TF-IDF baseline* | — | — | *0.969* | *<1ms* |
+| *BM25 baseline* | — | — | *0.965* | *<1ms* |
+| *BM25F tuned* | — | — | *0.949* | *<1ms* |
+| *BM25F default* | — | — | *0.936* | *<1ms* |
 
 Vector stores: Qdrant, ChromaDB, sqlite-vec tested at 550 records; pgvector included in scale tests up to 100K.
 

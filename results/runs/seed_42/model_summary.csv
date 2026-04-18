@@ -1,7 +1,7 @@
-model,best_threshold,best_f1,best_precision,best_recall,roc_auc,recall_at_0.90,total_pairs,total_duplicates
-all-minilm_latest,0.65,0.9791,0.9891,0.9693,0.9978,0.3709,4415,2440
-bge-m3_latest,0.68,0.9894,0.9832,0.9956,0.9989,0.2905,4475,2475
-mxbai-embed-large_latest,0.73,0.9871,0.9836,0.9907,0.9989,0.4723,4475,2475
-nomic-embed-text_latest,0.73,0.9808,0.9798,0.9818,0.9972,0.3556,4475,2475
-qwen3-embedding_latest,0.74,0.9899,0.9868,0.9931,0.9991,0.5786,4475,2475
-snowflake-arctic-embed_latest,0.65,0.9792,0.9778,0.9806,0.9979,0.2238,4475,2475
+model,best_threshold,best_f1,best_precision,best_recall,cv_f1_mean,cv_f1_std,cv_threshold,cv_precision,cv_recall,arch_cv_f1_mean,arch_cv_f1_std,arch_cv_threshold,roc_auc,recall_at_0.90,total_pairs,total_duplicates
+all-minilm_latest,0.65,0.9791,0.9891,0.9693,0.9777,0.0065,0.64,0.9839,0.9717,0.9658,0.0203,0.62,0.9978,0.3709,4415,2440
+bge-m3_latest,0.68,0.9894,0.9832,0.9956,0.9884,0.0035,0.69,0.984,0.9928,0.9837,0.0127,0.68,0.9989,0.2905,4475,2475
+mxbai-embed-large_latest,0.73,0.9871,0.9836,0.9907,0.9849,0.0046,0.73,0.9823,0.9876,0.9789,0.0129,0.72,0.9989,0.4723,4475,2475
+nomic-embed-text_latest,0.73,0.9808,0.9798,0.9818,0.98,0.003,0.73,0.9798,0.9803,0.9713,0.0095,0.73,0.9972,0.3556,4475,2475
+qwen3-embedding_latest,0.74,0.9899,0.9868,0.9931,0.9895,0.0009,0.74,0.9867,0.9924,0.9798,0.0134,0.73,0.9991,0.5786,4475,2475
+snowflake-arctic-embed_latest,0.65,0.9792,0.9778,0.9806,0.9793,0.0033,0.65,0.9779,0.9807,0.9648,0.0168,0.64,0.9979,0.2238,4475,2475
