@@ -27,8 +27,8 @@ I benchmarked 6 self-hosted embedding models for duplicate bug report detection.
 | all-minilm † | 22M | 384 | 0.977 | 28ms |
 | *TF-IDF baseline* | — | — | *0.969* | *<1ms* |
 | *BM25 baseline* | — | — | *0.965* | *<1ms* |
-| *BM25F tuned* | — | — | *0.949* | *<1ms* |
 | *BM25F default* | — | — | *0.936* | *<1ms* |
+| *BM25F tuned (5-fold CV)* | — | — | *0.873 ± 0.01* | *<1ms* |
 
 † all-minilm is evaluated on 4,415 of 4,475 pairs — 76 reports exceed its 256-token context (including all 10 in `sdk_json_parse_crash`, `sdk_rate_limit_429`, `sdk_zindex_conflict`, plus 12 GitHub issues). In production it will silently fail on long reports.
 
