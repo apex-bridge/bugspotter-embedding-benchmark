@@ -11,7 +11,7 @@ I benchmarked 6 self-hosted embedding models for duplicate bug report detection.
 - **The top 3 models are statistically tied.** qwen3 (CV F1=0.989), bge-m3 (0.988), and mxbai (0.986) have overlapping bootstrap 95% CIs — you can't pick a winner from F1 alone. Pick on latency, hard-negative errors, and pgvector compatibility.
 - **Threshold 0.9 is a trap.** At cosine ≥ 0.9, recall drops to 22–58%. Optimal thresholds range from 0.65 to 0.74, different for every model. Note: thresholds were tuned on the evaluation set — use them as starting points, not production values.
 - **Machine-captured metadata > human descriptions.** Console errors, network logs, and stack traces improved F1 from 0.951 to 0.990.
-- **Well-tuned BM25 is closer than folklore suggests.** On this synthetic benchmark, TF-IDF hits F1=0.969 and BM25 hits 0.965 — embeddings lead by only ~2 points. On Mozilla Bugzilla (real multi-author duplicates) the gap widens again, and the *ranking between embedding models shuffles* — bge-m3 drops from #2 to #4, all-minilm climbs from #6 to #3. Don't pick on a single dataset.
+- **Well-tuned BM25 is closer than folklore suggests — and on Bugzilla it beats half the embedding models.** On the synthetic benchmark, TF-IDF hits F1=0.969 and BM25 hits 0.965 — embeddings lead by only ~2 points. On Mozilla Bugzilla (real multi-author duplicates), BM25 scores 0.954 — beating `bge-m3` (0.948), `nomic` (0.894), `snowflake` (0.872), tying `all-minilm` (0.952), and losing only to `qwen3` (0.966) and `mxbai` (0.962). Rankings shuffle hard — `bge-m3` drops from #2 to #6 (below plain-text BM25). Run BM25 as a baseline before committing to embeddings.
 
 ## Models Tested
 
