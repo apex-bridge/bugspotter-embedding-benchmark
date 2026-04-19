@@ -63,8 +63,8 @@ def main():
     # Fixed label positions (in data coords) to avoid all overlaps
     # Format: model_key -> (label_x, label_y)
     LABEL_POSITIONS = {
-        "all-minilm": (45, 0.9765),
-        "snowflake-arctic-embed": (350, 0.9770),
+        "all-minilm": (45, 0.9695),
+        "snowflake-arctic-embed": (350, 0.9730),
         "nomic-embed-text": (140, 0.9825),
         "mxbai-embed-large": (350, 0.9880),
         "bge-m3": (400, 0.9900),
@@ -98,18 +98,51 @@ def main():
                         textcoords="offset points", xytext=(14, 10),
                         fontsize=11, fontweight="bold", color=color)
 
-    # Zoom Y-axis to show differences clearly
+    # === Add lexical baselines (BM25, TF-IDF) from bm25_summary.csv ===
+    bm25_path = "results/raw/bm25_summary.csv"
+    baseline_points = []
+    if os.path.exists(bm25_path):
+        with open(bm25_path) as f:
+            for row in csv.DictReader(f):
+                if row["model"] in ("tfidf_baseline", "bm25_baseline"):
+                    baseline_points.append((row["model"], float(row["best_f1"])))
+
+    # Place baselines at fixed small latency (~0.5ms) for plotting
+    # (actual latency is <1ms, script reports it as <1ms in the table)
+    BASELINE_LATENCY = 0.6
+    BASELINE_COLOR = MOCHA["subtext1"]  # light gray, distinct from embedding colors
+    BASELINE_LABELS = {
+        "tfidf_baseline": ("TF-IDF", (2.0, 0.967)),
+        "bm25_baseline": ("BM25", (1.3, 0.960)),
+    }
+
+    for model, f1 in baseline_points:
+        ax.scatter(BASELINE_LATENCY, f1, s=140, c=BASELINE_COLOR,
+                   alpha=0.85, edgecolors="white", linewidths=2,
+                   marker="D",  # diamond — distinct from embedding circles
+                   zorder=5)
+        display_name, lpos = BASELINE_LABELS.get(model, (model, None))
+        if lpos:
+            ax.annotate(display_name, (BASELINE_LATENCY, f1),
+                        xytext=lpos, fontsize=11, fontweight="bold",
+                        color=BASELINE_COLOR,
+                        arrowprops=dict(arrowstyle="-", color=BASELINE_COLOR, alpha=0.4, lw=1),
+                        zorder=6)
+
+    # Zoom Y-axis to show differences — now include baselines in range
     f1_values = [float(r["best_f1"]) for r in rows]
+    f1_values += [f1 for _, f1 in baseline_points]
     y_min = min(f1_values) - 0.004
-    y_max = max(f1_values) + 0.003
+    y_max = max(f1_values) + 0.004
     ax.set_ylim(y_min, y_max)
 
     ax.set_xlabel("Median Latency per Embedding (ms)", fontsize=13, fontweight="bold")
     ax.set_ylabel("Best F1 Score", fontsize=13, fontweight="bold")
-    ax.set_title("Embedding Models for Bug Deduplication: F1 vs Latency",
+    ax.set_title("Embedding Models vs Lexical Baselines: F1 vs Latency",
                  fontsize=15, fontweight="bold", pad=15)
 
-    ax.annotate("bubble size = model parameters", xy=(0.02, 0.02),
+    ax.annotate("bubble size = model parameters; diamonds = lexical baselines",
+                xy=(0.02, 0.02),
                 xycoords="axes fraction", fontsize=9, color=MOCHA["overlay1"],
                 style="italic")
 
