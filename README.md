@@ -129,14 +129,20 @@ This installs everything, pulls models, generates the dataset, and runs the full
 ├── docker-compose.yml          # Ollama + pgvector + Qdrant
 ├── requirements.txt            # Python dependencies (pinned ranges)
 ├── data/
-│   ├── scrape_github.py        # Scrape GitHub Issues (300 reports)
-│   ├── generate_synthetic.py   # Synthetic bug reports (200 + 40 SDK captures)
+│   ├── scrape_github.py        # Scrape GitHub Issues (100 reports)
+│   ├── scrape_bugzilla.py      # Scrape Mozilla Bugzilla (407 bugs for cross-validation)
+│   ├── collect_sdk_captures.js # Playwright driver for SDK-captured bugs
+│   ├── convert_sdk_to_benchmark.py # Raw SDK captures → benchmark format
+│   ├── generate_synthetic.py   # Synthetic bug reports (30 archetypes × 10)
 │   └── generate_pairs.py       # Ground truth pairs (D1–D4)
 ├── benchmark/
 │   ├── run_all.sh              # Full pipeline orchestrator
 │   ├── embed_all.py            # Generate embeddings (6 models via Ollama)
 │   ├── compute_similarity.py   # Pairwise cosine similarity
 │   ├── sweep_threshold.py      # Threshold sweep (P/R/F1/AUC)
+│   ├── bm25_baseline.py        # TF-IDF, BM25, BM25F lexical baselines (synthetic)
+│   ├── bm25_bugzilla.py        # TF-IDF + BM25 on Mozilla Bugzilla
+│   ├── bugzilla_validation.py  # All 6 embedding models on 407 Bugzilla bugs
 │   ├── e4_embedding_strategy.py # What text to embed? (title vs full capture)
 │   ├── mrl_truncation.py       # Matryoshka dimension truncation
 │   ├── vector_store_bench.py   # 4-store comparison (real data)
