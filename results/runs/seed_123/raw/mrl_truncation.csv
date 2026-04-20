@@ -1,0 +1,9 @@
+model,dim,is_full,best_threshold,f1,precision,recall,storage_100k_mb,f1_loss_vs_full
+nomic-embed-text_latest,128,False,0.78,0.9723,0.9744,0.9701,48.8,0.0093
+nomic-embed-text_latest,256,False,0.75,0.9766,0.9739,0.9794,97.7,0.005
+nomic-embed-text_latest,512,False,0.73,0.9808,0.9791,0.9826,195.3,0.0008
+nomic-embed-text_latest,768,True,0.73,0.9816,0.9799,0.9834,293.0,0.0
+qwen3-embedding_latest,128,False,0.78,0.9903,0.9872,0.9935,48.8,-0.0004
+qwen3-embedding_latest,256,False,0.76,0.9906,0.9848,0.9964,97.7,-0.0007
+qwen3-embedding_latest,512,False,0.77,0.9911,0.9887,0.9935,195.3,-0.0012
+qwen3-embedding_latest,4096,True,0.74,0.9899,0.9868,0.9931,1562.5,0.0

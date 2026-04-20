@@ -1,0 +1,2 @@
+model,cv_f1_mean,cv_f1_std,oracle_f1,overfitting_gap,n_folds,total_pairs
+bm25f_tuned_cv,0.9457,0.0088,0.9488,0.0031,5,4475

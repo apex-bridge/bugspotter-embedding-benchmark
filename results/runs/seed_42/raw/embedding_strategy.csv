@@ -1,0 +1,5 @@
+strategy,f1,precision,recall,threshold,avg_text_words,embed_time_s
+A: Title only,0.9514,0.95,0.9527,0.62,7.9,188.0
+B: Title + Desc,0.9781,0.9797,0.9766,0.65,28.0,570.0
+C: Title + Desc + Console,0.9762,0.9739,0.9786,0.71,34.7,798.0
+D: All (BugSpotter full),0.9897,0.9883,0.9911,0.75,65.8,2342.4
