@@ -183,6 +183,15 @@ echo ""
 echo "--- BM25 Results ---"
 cat results/raw/bm25_summary.csv
 
+# 7d. BM25F with 5-fold CV — honest tuned number (bm25_baseline's tuned is oracle)
+echo ""
+step "7d/13 BM25F 5-fold CV"
+echo "=== 7d. BM25F 5-fold CV (proper tuning protocol) ==="
+python benchmark/bm25f_cv.py
+echo ""
+echo "--- BM25F CV ---"
+cat results/raw/bm25f_cv_summary.csv
+
 # ===== 8. E3: MRL TRUNCATION =====
 echo ""
 step "8/13 E3: MRL truncation"
@@ -230,8 +239,17 @@ echo "=== 10b. Bugzilla cross-validation (all 6 models on independent data) ==="
 if [ -f "data/bugzilla_bugs.json" ]; then
     python benchmark/bugzilla_validation.py
     echo ""
-    echo "--- Bugzilla Results ---"
+    echo "--- Bugzilla (embeddings) ---"
     cat results/raw/bugzilla_summary.csv
+
+    # 10c. BM25 + TF-IDF on Bugzilla — completes the "BM25 beats half the embeddings" finding
+    echo ""
+    step "10c/13 BM25 on Bugzilla"
+    echo "=== 10c. BM25 + TF-IDF on Mozilla Bugzilla ==="
+    python benchmark/bm25_bugzilla.py
+    echo ""
+    echo "--- Bugzilla (BM25/TF-IDF) ---"
+    cat results/raw/bugzilla_bm25_summary.csv
 else
     echo "    WARNING: Bugzilla data missing, skipping validation"
 fi

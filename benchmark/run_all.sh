@@ -74,10 +74,30 @@ python benchmark/sweep_threshold.py \
     --output-sweep results/raw/threshold_sweep.csv \
     --output-summary results/raw/model_summary.csv
 
-# Step 5b: BM25/TF-IDF baseline
+# Step 5b: BM25/TF-IDF baseline (synthetic dataset)
 echo ""
-echo "=== Step 5b: BM25/TF-IDF baseline ==="
+echo "=== Step 5b: BM25/TF-IDF baseline (synthetic) ==="
 python benchmark/bm25_baseline.py
+
+# Step 5c: BM25F with 5-fold CV — honest tuned number
+# (bm25_baseline's bm25f_tuned is oracle-F1; this is the protocol-correct version)
+echo ""
+echo "=== Step 5c: BM25F 5-fold CV ==="
+python benchmark/bm25f_cv.py
+
+# Step 5d: Mozilla Bugzilla cross-validation (requires data/bugzilla_bugs.json)
+if [ -f "data/bugzilla_bugs.json" ]; then
+    echo ""
+    echo "=== Step 5d: 6-model Bugzilla validation ==="
+    python benchmark/bugzilla_validation.py
+
+    echo ""
+    echo "=== Step 5e: BM25 + TF-IDF on Bugzilla ==="
+    python benchmark/bm25_bugzilla.py
+else
+    echo ""
+    echo "=== Skipping Bugzilla (data/bugzilla_bugs.json missing) ==="
+fi
 
 # Step 6: MRL truncation experiment
 echo ""

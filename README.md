@@ -140,7 +140,8 @@ This installs everything, pulls models, generates the dataset, and runs the full
 │   ├── embed_all.py            # Generate embeddings (6 models via Ollama)
 │   ├── compute_similarity.py   # Pairwise cosine similarity
 │   ├── sweep_threshold.py      # Threshold sweep (P/R/F1/AUC)
-│   ├── bm25_baseline.py        # TF-IDF, BM25, BM25F lexical baselines (synthetic)
+│   ├── bm25_baseline.py        # TF-IDF, BM25, BM25F lexical baselines (synthetic; tuned BM25F is oracle, see bm25f_cv.py)
+│   ├── bm25f_cv.py             # BM25F tuned with proper 5-fold CV — honest F1
 │   ├── bm25_bugzilla.py        # TF-IDF + BM25 on Mozilla Bugzilla
 │   ├── bugzilla_validation.py  # All 6 embedding models on 407 Bugzilla bugs
 │   ├── e4_embedding_strategy.py # What text to embed? (title vs full capture)

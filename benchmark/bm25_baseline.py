@@ -1,12 +1,21 @@
 """
-Lexical baselines for bug report deduplication: TF-IDF and BM25.
+Lexical baselines for bug report deduplication: TF-IDF, BM25, and BM25F.
 
-Computes pairwise similarity using two keyword-based methods on the same
+Computes pairwise similarity using keyword-based methods on the same
 pairs as the embedding models. This answers: "do you even need embeddings,
 or would keyword matching work?"
 
 Uses the same prepare_text() function as the embedding pipeline, so the
 input text is identical — only the vectorization method differs.
+
+IMPORTANT — oracle vs. CV F1:
+  The `bm25f_tuned` row written to bm25_summary.csv is ORACLE F1:
+  field weights are grid-searched on all pairs and the best F1 is
+  reported on the same pairs. This overfits. For the honest, protocol-
+  correct F1 matching the embedding models' 5-fold CV, run
+  `benchmark/bm25f_cv.py` — it produces bm25f_cv_summary.csv.
+  The article's main table uses the CV number (0.873), not the
+  oracle (0.949) written here.
 
 Output: results/raw/similarity_scores.csv (appends baseline rows)
         results/raw/bm25_summary.csv
