@@ -4,10 +4,10 @@ __pycache__/
 *.pyc
 *.egg-info/
 
-# Scraped data (regenerate with data/scrape_*.py)
-data/github_issues.json
-# bugzilla_bugs.json is committed — keeps the 407-bug cross-validation
-# set deterministic across reruns (Bugzilla API can rate-limit / change).
+# Scraped-data files are committed so the benchmark is fully deterministic
+# across reruns — scraper APIs can rate-limit, change responses, or expire
+# issues between runs. To regenerate instead, see data/scrape_*.py.
+# Previously gitignored: data/github_issues.json, data/bugzilla_bugs.json
 
 # Results (regenerate with benchmark/ scripts)
 results/raw/
