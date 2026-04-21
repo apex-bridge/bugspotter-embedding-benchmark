@@ -8,10 +8,10 @@ I benchmarked 6 self-hosted embedding models for duplicate bug report detection.
 
 ## Key Findings
 
-- **The top 3 models are statistically tied.** qwen3 (CV F1=0.989), bge-m3 (0.988), and mxbai (0.986) have overlapping bootstrap 95% CIs — you can't pick a winner from F1 alone. Pick on latency, hard-negative errors, and pgvector compatibility.
-- **Threshold 0.9 is a trap.** At cosine ≥ 0.9, recall drops to 22–58%. Optimal thresholds range from 0.65 to 0.74, different for every model. Note: thresholds were tuned on the evaluation set — use them as starting points, not production values.
+- **qwen3 leads; bge-m3 and mxbai are tied for second.** qwen3 (CV F1=0.990) beats bge-m3 (0.986) and mxbai (0.984) by ~0.004–0.006 F1 across 3 seeds. bge-m3 and mxbai overlap on bootstrap 95% CIs — pick between them on latency, pgvector compat, and multilingual support.
+- **Threshold 0.9 is a trap.** At cosine ≥ 0.9, recall drops to 22–58%. Optimal thresholds range from 0.62 to 0.73, different for every model. Note: thresholds were tuned on the evaluation set — use them as starting points, not production values.
 - **Machine-captured metadata > human descriptions.** Console errors, network logs, and stack traces improved F1 from 0.951 to 0.990.
-- **Well-tuned BM25 is closer than folklore suggests — and on Bugzilla it beats half the embedding models.** On the synthetic benchmark, TF-IDF hits F1=0.969 and BM25 hits 0.965 — embeddings lead by only ~2 points. On Mozilla Bugzilla (real multi-author duplicates), BM25 scores 0.954 — beating `bge-m3` (0.948), `nomic` (0.894), `snowflake` (0.872), tying `all-minilm` (0.952), and losing only to `qwen3` (0.966) and `mxbai` (0.962). Rankings shuffle hard — `bge-m3` drops from #2 to #6 (below plain-text BM25). Run BM25 as a baseline before committing to embeddings.
+- **Simple lexical baselines hold up better than folklore suggests — and BM25F tuning actively overfits.** Plain BM25 (whitespace tokenization, no fields) scores F1=0.951 on synthetic and 0.954 on Mozilla Bugzilla — beating 4 of 6 embedding models on Bugzilla (`bge-m3` 0.948, `nomic` 0.894, `snowflake` 0.872, narrowly `all-minilm` 0.952). Field-weighted BM25F drops to 0.923; "tuning" it via grid-searched weights gives a misleading oracle F1 of 0.923 but only 0.872 ± 0.012 under proper 5-fold CV — a 5-point overfitting gap even at 6 weight configs on 4,475 pairs. `bge-m3` drops from #2 on synthetic to #6 on Bugzilla (below plain BM25). Run BM25 as a baseline before committing to embeddings.
 
 ## Models Tested
 
@@ -19,16 +19,16 @@ I benchmarked 6 self-hosted embedding models for duplicate bug report detection.
 
 | Model | Params | Dims | CV F1 | Latency |
 |-------|--------|------|-------|---------|
-| qwen3-embedding | 7.6B | 4096 | 0.989 | 2,662ms |
-| bge-m3 | 568M | 1024 | 0.988 | 268ms |
-| mxbai-embed-large | 335M | 1024 | 0.986 | 224ms |
-| nomic-embed-text | 137M | 768 | 0.980 | 82ms |
-| snowflake-arctic-embed | 334M | 768 | 0.980 | 220ms |
-| all-minilm † | 22M | 384 | 0.977 | 28ms |
-| *TF-IDF baseline* | — | — | *0.969* | *<1ms* |
-| *BM25 baseline* | — | — | *0.965* | *<1ms* |
-| *BM25F default* | — | — | *0.936* | *<1ms* |
-| *BM25F tuned (5-fold CV)* | — | — | *0.947 ± 0.008* | *<1ms* |
+| qwen3-embedding | 7.6B | 4096 | 0.990 | 2,662ms |
+| bge-m3 | 568M | 1024 | 0.986 | 268ms |
+| mxbai-embed-large | 335M | 1024 | 0.984 | 224ms |
+| all-minilm † | 22M | 384 | 0.978 | 28ms |
+| snowflake-arctic-embed | 334M | 768 | 0.977 | 220ms |
+| nomic-embed-text | 137M | 768 | 0.973 | 82ms |
+| *TF-IDF baseline* | — | — | *0.973* | *<1ms* |
+| *BM25 baseline* | — | — | *0.951* | *<1ms* |
+| *BM25F default* | — | — | *0.923* | *<1ms* |
+| *BM25F tuned (5-fold CV)* | — | — | *0.872 ± 0.012* | *<1ms* |
 
 † all-minilm is evaluated on 4,415 of 4,475 pairs — 76 reports exceed its 256-token context (including all 10 in `sdk_json_parse_crash`, `sdk_rate_limit_429`, `sdk_zindex_conflict`, plus 12 GitHub issues). In production it will silently fail on long reports.
 

@@ -1,3 +1,3 @@
 store,insert_time_s,query_p50_ms,query_p95_ms,recall_at_10,storage_bytes,storage_mb,ram_delta_mb,num_records,dim
-chromadb,0.68,3.65,4.16,1.0,26088164,24.88,10.9,550,4096
-sqlite-vec,0.398,6.14,6.73,1.0,16883712,16.1,14.5,550,4096
+chromadb,0.794,3.7,4.33,1.0,27788004,26.5,15.9,650,4096
+sqlite-vec,0.596,6.99,7.93,1.0,16891904,16.11,14.5,650,4096
